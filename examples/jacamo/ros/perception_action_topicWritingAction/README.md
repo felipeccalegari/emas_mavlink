@@ -21,14 +21,16 @@ Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 ##### 1.1.1 ROS 1: 
 
    ```
-   sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
-   /bin/bash -c "source /opt/ros/noetic/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch & \
-                 while ! rostopic list | grep '/value1'; do \
-                 source /opt/ros/noetic/setup.bash; \
-                 sleep 1; \
-                 done \
-                 && (rostopic pub /value1 std_msgs/Int32 0 & rostopic pub /current_time std_msgs/String 'unknown') \
-                "
+sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-mas-ros:0.5 \
+/bin/bash -c " ((source /opt/ros/noetic/setup.bash &&roslaunch rosbridge_server rosbridge_websocket.launch) & \
+                (echo -e '\e[1;33m**** Launching the Docker container. Wait a few seconds...****\e[0m]'  && \
+                 sleep 5 && \
+                 source /opt/ros/noetic/setup.bash && \
+                 (rostopic pub /value1 std_msgs/Int32 0  > /dev/null 2>&1 & \
+                  rostopic pub /current_time std_msgs/String 'unknown'  > /dev/null 2>&1 &)&&\
+                 echo -e '\e[1;33m**** Docker container is ready. Start the JaCaMo application****\e[0m]' && \
+                 tail -f /dev/null  ))"
+              
    ```
 
 ##### 1.1.2 ROS 2:
