@@ -4,11 +4,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import java.io.InputStream;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.DirectoryStream;
 import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +23,7 @@ public class InternalActionGenerator  {
 	private static void writeToFile(String deviceId, String actionName, String serviceName, List<String> params) {
 		Path filePath = Paths.get("src/java/jason/stdlib/" + actionName + ".java");		
 		if(Files.exists(filePath))
-			System.out.println("*** internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
+			System.out.println("*** [information] internal action " + actionName + " already exists in src/java/jason/stdlib and will not be overwritten ***");
 		else {
 			String fileContent = "package jason.stdlib; \n\n" +
 					"import embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction;\n" +
@@ -63,19 +65,36 @@ public class InternalActionGenerator  {
 		}
 	}
 
+
+	private static List<Path> listYamlFiles(Path dir) {
+           List<Path> yamlFiles = new ArrayList<>();
+           try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.yaml")) {
+              for (Path entry : stream) {
+                 yamlFiles.add(entry);
+              }
+           } catch (IOException e) {
+              e.printStackTrace();
+           }
+           return yamlFiles;
+        }
+        
 	public static void main(String[] args) {
-		Yaml yaml = new Yaml();
+		Path directoryPath = Paths.get("src/agt");
 
-		InputStream inputStream = InternalActionGenerator.class
+        	List<Path> yamlFiles = listYamlFiles(directoryPath);
+	        for(Path f: yamlFiles){
+   		   Yaml yaml = new Yaml();
+
+		   InputStream inputStream = InternalActionGenerator.class
 				.getClassLoader()
-				.getResourceAsStream("robot1.yaml");
+				.getResourceAsStream(f.getFileName().toString());
 
-		if (inputStream == null) {
-			throw new IllegalArgumentException("File not found! Check the file path.");
-		}
-		List<Map<String, Object>> yamlData = yaml.load(inputStream);
+		   if (inputStream == null) {
+		 	throw new IllegalArgumentException("File not found! Check the file path.");
+		   }
+		   List<Map<String, Object>> yamlData = yaml.load(inputStream);
 
-		for (Map<String, Object> device : yamlData) {
+		   for (Map<String, Object> device : yamlData) {
 			String deviceId = (String) device.get("device_id");
 			Map<String, Object> actions = (Map<String, Object>) device.get("actions");
 			if(actions!=null) {
@@ -103,5 +122,6 @@ public class InternalActionGenerator  {
 				}
 			}
 		}
+	   }	
 	}
 }

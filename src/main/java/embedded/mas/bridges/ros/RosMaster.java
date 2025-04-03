@@ -100,8 +100,9 @@ public class RosMaster extends LiteralDevice {
 
 	@Override
 	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
-		if(!checkArrayArguments(args))
-			return false;
+		System.out.println("[RosMaster] going to exec action " + args );
+//		if(!checkArrayArguments(args))
+//			return false;
 		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
@@ -120,7 +121,7 @@ public class RosMaster extends LiteralDevice {
 
 
 	/**
-	 * Check wheter the arguments are consistent.
+	 * Check whether the arguments are consistent.
 	 */
 	private boolean checkArrayArguments(Object[] args) {
 		for(int i=0;i<args.length;i++) {

@@ -500,7 +500,7 @@ public class RosBridge {
 	 * @param msg should be a {@link java.util.Map} or a Java Bean, specifying the ROS message
 	 */
 	public void publish(String topic, String type, Object msg){
-
+		//System.out.println("[RosBridge] msg: " + msg.toString());
 		if(this.session == null){
 			throw new RuntimeException("Rosbridge connection is closed. Cannot publish. Attempted Topic Publish: " + topic);
 		}
