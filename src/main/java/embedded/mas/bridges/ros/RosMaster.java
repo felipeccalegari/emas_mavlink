@@ -99,8 +99,7 @@ public class RosMaster extends LiteralDevice {
 
 
 	@Override
-	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {
-		System.out.println("[RosMaster] going to exec action " + args );
+	public boolean execEmbeddedAction(Atom actionName,Object[] args, Unifier un) {	
 //		if(!checkArrayArguments(args))
 //			return false;
 		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
