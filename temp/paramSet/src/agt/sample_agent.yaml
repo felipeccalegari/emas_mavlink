@@ -19,8 +19,6 @@
         params:    
           - param_id      
           - value:
-            - integer:
-              - value
-            - real:
-              - value
+            - integer
+            - real
           
