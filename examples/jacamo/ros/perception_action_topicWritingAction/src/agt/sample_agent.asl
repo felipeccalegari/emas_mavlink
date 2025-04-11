@@ -16,7 +16,7 @@
 +current_hour(V) : .time(H,M,S) & .concat(H,":",M,":",S,Msg)
    <-.print("Read time ", V, " - ", Msg);
      .wait(2000);
-     .update_time(msg).
+     .update_time(Msg).
      
       
       

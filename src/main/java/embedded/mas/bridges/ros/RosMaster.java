@@ -105,14 +105,12 @@ public class RosMaster extends LiteralDevice {
 		EmbeddedAction action = this.getEmbeddedActions().get(actionName);
 		if(action!=null)
 			if(action instanceof TopicWritingAction) {
-				((TopicWritingAction)action).setValue(args);
+				((TopicWritingAction)action).setParamValues(args);
 				this.getMicrocontroller().execEmbeddedAction(action);
 			}	
 			else
 				if(action instanceof ServiceRequestAction) {
-					for(int i=0;i<args.length;i++) { //set service params
-						((ServiceRequestAction)action).getServiceParameters().get(i).setParamValue(args[i]);						
-					}					
+					((ServiceRequestAction)action).setParamValues(args);										
 					this.getMicrocontroller().execEmbeddedAction(action);
 				}
 		return true;

@@ -361,12 +361,8 @@ public class DefaultConfig {
 										for(int j=0;j<serviceRequestActions.size();j++) {
 											ServiceParameters params = new ServiceParameters();
 											if(((LinkedHashMap)serviceRequestActions.get(j)).get("params")!=null)
-												for(int k=0;k< ((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).size();k++) {
-													ServiceParam p = new ServiceParam(((ArrayList)((LinkedHashMap)serviceRequestActions.get(j)).get("params")).get(k).toString(), 
-															null);
-													params.add(p);
-												}
-											ServiceRequestAction serviceAction = null;
+												params = buildServiceParameters( (ArrayList<Object>) ((LinkedHashMap) serviceRequestActions.get(j)).get("params"));
+											ServiceRequestAction serviceAction = null; 
 											serviceAction = new ServiceRequestAction(createAtom(((LinkedHashMap)serviceRequestActions.get(j)).get("actionName").toString()), 
 													((LinkedHashMap)serviceRequestActions.get(j)).get("serviceName").toString(), params);
 											embeddedActionList.add(serviceAction);

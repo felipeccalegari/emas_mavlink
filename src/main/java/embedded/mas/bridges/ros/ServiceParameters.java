@@ -64,9 +64,12 @@ public class ServiceParameters extends ArrayList<ServiceParam> {
 
 	@Override
 	public String toString() {
-		String s = "ServiceParameters ";
-		for(int i=0;i<this.size();i++)
-			s = s.concat(this.get(i).getParamName());
+		String s = " ";
+		for(int i=0;i<this.size();i++) {
+			s = s.concat(this.get(i).getParamName()).concat(" ");
+			if(this.get(i).getParamValue() instanceof ServiceParameters)
+				s = s.concat("[").concat(((ServiceParameters)this.get(i).getParamValue() ).toString().concat("]"));
+		}
 		return s;
 	}
 
