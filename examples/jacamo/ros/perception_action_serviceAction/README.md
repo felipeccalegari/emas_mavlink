@@ -25,6 +25,14 @@ It is possible to choose between a container-based setup (only Docker is require
 Requirements: [Docker](https://www.docker.com/)
 
 First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+- ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
+- ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
+
+Then, go to [http://localhost:8080/vnc.html](http://localhost:8080/vnc.html) to inspect the turtle simulator.
+
+
+
+<!--
 ##### 1.1.1 ROS 1: 
    ```
 sudo docker run -d --rm --net=ros --env="DISPLAY_WIDTH=3000" --env="DISPLAY_HEIGHT=1800" --env="RUN_XTERM=no" --name=novnc -p=8080:8080 theasp/novnc:latest && \
@@ -47,6 +55,7 @@ sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=ht
 (until sudo docker exec embedded-mas-example /bin/bash -c "echo '***** ROS container is ready *****'" 2>/dev/null; do echo "waiting for ROS container to start..."; sleep 1; done  && \
 sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml")
 ```
+-->
 
 #### 1.2 Local setup: 
 Requirements
