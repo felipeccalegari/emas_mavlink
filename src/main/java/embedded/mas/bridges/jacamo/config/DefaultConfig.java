@@ -52,6 +52,7 @@ import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
+import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
 import embedded.mas.bridges.ros.ServiceParam;
@@ -61,6 +62,9 @@ import embedded.mas.bridges.ros.TopicWritingAction;
 import embedded.mas.exception.InvalidActuationException;
 import embedded.mas.exception.InvalidActuatorException;
 import embedded.mas.exception.InvalidDeviceException;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 import jason.asSyntax.Atom;
 import jason.asSyntax.Literal;
 import jason.asSyntax.parser.ParseException;
@@ -75,6 +79,23 @@ public class DefaultConfig {
 
 	private Arduino4EmbeddedMas createArduino4EmbeddedMas(String serialPort, int baudRate) {
 		Arduino4EmbeddedMas a = new Arduino4EmbeddedMas(serialPort, baudRate);
+		return a;
+	}
+	
+	private NRJ4EmbeddedMas createNRJ4EmbeddedMas(String serialPort, int baudRate) {
+		NRJ4EmbeddedMas a = null;
+		try {
+			a = new NRJ4EmbeddedMas(serialPort, baudRate);
+		} catch (NoSuchPortException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PortInUseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedCommOperationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return a;
 	}
 
@@ -310,7 +331,20 @@ public class DefaultConfig {
 
 
 							}
-						}		
+						}
+						else
+							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
+								microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+										Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+								ArrayList actionsArray = (ArrayList) item.get("serialActions");
+								for(int j=0;j<actionsArray.size();j++) {
+									SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+											createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
+									embeddedActionList.add(action);
+
+
+								}
+							}
 						else
 							//if the current device is a ros node
 							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
