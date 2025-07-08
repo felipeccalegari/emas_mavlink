@@ -1,0 +1,71 @@
+- device_id: sample_roscore
+  className: MyRosMaster
+  microcontroller: 
+    id: ros1 
+    className: DefaultRos4EmbeddedMas  
+    connectionString: ws://localhost:9090 # connection with ROS      
+  perceptionTopics:
+    - topicName: value1
+      topicType: std_msgs/Int32
+    - topicName: value2
+      topicType: std_msgs/Int32  
+    - topicName: current_time
+      topicType: std_msgs/String
+      beliefName: current_hour
+  # actions:    
+  #   topicWritingActions:
+  #     - actionName: test
+  #       topicName: /plan_path/goal
+  #       topicType: boustrophedon_msgs/PlanMowingPathActionGoal 
+  #       params:    
+  #         - header:
+  #             - seq
+  #             - stamp:
+  #               - secs
+  #               - nsecs
+  #             - frame_id
+  #         - goal_id:
+  #             - stamp:
+  #               - secs
+  #               - nsecs
+  #             - id
+  #         - goal:
+  #           - property:
+  #             - header:
+  #               - seq
+  #               - stamp:
+  #                   - secs
+  #                   - nsecs
+  #               - frame_id
+  #             - polygon:
+  #               - points:
+  #                   - x
+  #                     y
+  #                     z
+  #                   - x
+  #                     y
+  #                     z
+  #                   - x
+  #                     y
+  #                     z
+  #                   - x
+  #                     y
+  #                     z
+  #           - robot_position:
+  #             - header:
+  #               - seq
+  #               - stamp:
+  #                 - secs
+  #                 - nsecs
+  #               - frame_id
+  #             - pose:
+  #               - position:
+  #                   x
+  #                   y
+  #                   z
+  #                 orientation:
+  #                   x
+  #                   y
+  #                   z
+  #                   w
+

@@ -1,7 +1,7 @@
 # Example of ROS-Based agent
 
 ## Scenario
-This example illustrates agent actions that correspond to ROS service requests. It contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```. This service does not have a response message. Actions based on services without response handling are triggered by the ```defaultEmbeddedInternalAction``` internal action.
+This example illustrates agent actions that correspond to ROS service requests. It contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```. This service does not have a response message. Actions based on services without response handling are triggered by the ```move_turtle``` internal action.
 
 To illustrate actions that consider the service responses, the agent also executes the action ```get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. Actions based on services with response handling are triggered by the ```requestResponseEmbeddedInternalAction``` internal action.
 
@@ -9,22 +9,33 @@ To illustrate actions that consider the service responses, the agent also execut
 
 
 
-=== Requirements
-1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
+### Requirements
+<!-- 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
-
+-->
+1. Java JRE >= 17
+2. [Docker](https://www.docker.com/) (recommended - in the case of container-based simulation setup)
+3. [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim) (in the case of local simulation setup)
 
 ## Running the example
 
 
-### 1. Ros node setup:
+### 1. Simulation setup:
 It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
 
 #### 1.1 Container-based setup: 
 Requirements: [Docker](https://www.docker.com/)
 
 First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+- ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
+- ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
+
+Then, go to [http://localhost:8080/vnc.html](http://localhost:8080/vnc.html) to inspect the turtle simulator.
+
+
+
+<!--
 ##### 1.1.1 ROS 1: 
    ```
 sudo docker run -d --rm --net=ros --env="DISPLAY_WIDTH=3000" --env="DISPLAY_HEIGHT=1800" --env="RUN_XTERM=no" --name=novnc -p=8080:8080 theasp/novnc:latest && \
@@ -47,6 +58,7 @@ sudo docker run -it --net=ros --env="DISPLAY=novnc:0.0" --env="ROS_MASTER_URI=ht
 (until sudo docker exec embedded-mas-example /bin/bash -c "echo '***** ROS container is ready *****'" 2>/dev/null; do echo "waiting for ROS container to start..."; sleep 1; done  && \
 sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml")
 ```
+-->
 
 #### 1.2 Local setup: 
 Requirements
