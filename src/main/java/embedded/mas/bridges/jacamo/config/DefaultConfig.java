@@ -321,16 +321,17 @@ public class DefaultConfig {
 								ArrayList<String> types = new ArrayList<String>();
 								ArrayList<String> beliefNames = new ArrayList<String>();
 								HashMap<String, ArrayList<String>> ignoreParams = new HashMap<>();
-								for(int j=0;j<perceptionTopics.size();j++) {
-									topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
-									if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
-									else
-										beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
-									ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
-									ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
-								}
+								if(perceptionTopics!=null)
+									for(int j=0;j<perceptionTopics.size();j++) {
+										topics.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+										types.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicType").toString());
+										if(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName")==null)
+											beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString());
+										else
+											beliefNames.add(((LinkedHashMap)perceptionTopics.get(j)).get("beliefName").toString());	
+										ArrayList tempParams =  (ArrayList) ((LinkedHashMap)perceptionTopics.get(j)).get("ignoreValues");
+										ignoreParams.put(((LinkedHashMap)perceptionTopics.get(j)).get("topicName").toString(), tempParams);
+									}
 
 								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas"))
 									microcontroller= createRos4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("connectionString").toString(),topics,types,beliefNames, ignoreParams);
