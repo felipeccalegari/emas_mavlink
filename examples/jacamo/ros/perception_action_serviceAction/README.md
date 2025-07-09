@@ -6,26 +6,33 @@ This application contains a randomly moving turtle agent (see the agent code [he
 
 To illustrate actions that consider the service responses, the agent also executes the action ```do_get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. 
 
+The relation between agent's action and ROS services is summarized in the table below:
+
+| Agent action     | ROS service               |
+|------------------|---------------------------|
+| move_turtle      | /turtle1/teleport_relative |
+| do_get_loggers   | /turtlesim/get_loggers     |
 
 
 
 
-### Requirements
+# Requirements
 <!-- 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
 -->
 1. Java JRE >= 17
-2. [Docker](https://www.docker.com/) (recommended - in the case of container-based simulation setup)
-3. [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim) (in the case of local simulation setup)
+2. Turtlesim ROS-based simulator infrastructure, available in some of the following options:   
+  2.1. [Docker](https://www.docker.com/) (recommended - in the case of container-based simulation setup)   or  
+  2.2. [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim) (in the case of local simulation setup)  
 
-## Running the example
+# Running the example
 
 
-### 1. Simulation setup:
-It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
+## 1. Simulation setup:
+It is possible to choose between a container-based setup (recommended - only Docker is required) and a local setup (ROS core and related tools are required).
 
-#### 1.1 Container-based setup: 
+### 1.1 Container-based setup: 
 Requirements: [Docker](https://www.docker.com/)
 
 First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
@@ -61,19 +68,16 @@ sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setu
 ```
 -->
 
-#### 1.2 Local setup: 
-Requirements
-1. ROS 1 (recommended [ROS Noetic](http://wiki.ros.org/noetic)) or ROS 2 (recommended [ROS Humble](http://wiki.ros.org/humble))
-2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
+### 1.2 Local setup:
 
 To run the ROS node in your computer, run the following steps:
 
-##### 1.2.1  Start the roscore:
+#### 1.2.1  Start the roscore:
 ROS 1: ``` roscore ```
 
 ROS 2: this step is not requred.
 
-##### 1.1.2. Launch the bridge between ROS and Java
+#### 1.2.2. Launch the bridge between ROS and Java
 ROS 1:
 ```
 roslaunch rosbridge_server rosbridge_websocket.launch
@@ -84,7 +88,7 @@ ROS 2:
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 ```
 
-##### 1.1.3. Launch the turtlesim simulation
+#### 1.2.3. Launch the turtlesim simulation
 ROS 1: 
 ```
 rosrun turtlesim turtlesim_node
@@ -96,7 +100,7 @@ ros2 run turtlesim turtlesim_node
 
 
 
-### 2. Launch the JaCaMo application:
+## 2. Launch the JaCaMo application:
 
 Linux:
 ```
