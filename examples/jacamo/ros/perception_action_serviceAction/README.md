@@ -1,9 +1,10 @@
-# Example of ROS-Based agent
+# Application overview
+This application example example illustrates agent actions that realized through requests to ROS services.
 
-## Scenario
-This example illustrates agent actions that correspond to ROS service requests. It contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```. This service does not have a response message. Actions based on services without response handling are triggered by the ```move_turtle``` internal action.
+# Scenario
+This application contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```, which moves a simulated turtle-shaped robot controlled by ROS. This service does not have a response message. <!--Actions based on services without response handling are triggered by the ```move_turtle``` internal action. -->
 
-To illustrate actions that consider the service responses, the agent also executes the action ```get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. Actions based on services with response handling are triggered by the ```requestResponseEmbeddedInternalAction``` internal action.
+To illustrate actions that consider the service responses, the agent also executes the action ```do_get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. 
 
 
 
