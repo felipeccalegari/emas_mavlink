@@ -1,12 +1,28 @@
-# Example of ROS-Based agent
+# 1. Application overview
+This application example illustrates an agent whose (i) beliefs include values read from ROS topics and (ii) actions are realized by writing in ROS topics.
 
-## Scenario
+# 2. Application Scenario
+The application contains an agent that monitors two values from the environment, called `value1` and `value2`. These values are represented in the agent's mind by the beliefs `value1(V)` and `value2(V)` (s.t `V` is the perceived value). Besides, the agent perceives the current time from a clock available in the environment. This time is represented in the agent's mind by the belief `current_hour(V)` (where `V`is the current time). These perceptions/beliefs are obtained from ROS topics, as summarized in the table below:
 
-This example illustrates an agent whose (i) beliefs include values read from ROS topics and (ii) whose actions include writing in ROS Topics.
+| Belief/Perception | ROS Topic     |
+|-------------------|---------------|
+| value1            | value1        |
+| value2            | value2        |
+| current_hour      | current_time  |
 
-The scenario includes the topics ```value1``` and ```value2```, which store integer values. When `value1` changes, the agent increments its value and writes it in `value2`. When `value2` changes, the agent increments its value and writes it in `value1`. This process runs in a loop.
 
-The scenario also includes a topic `current_time`, which stores a string describing the current time. The agent perceives this information and updates the topic.
+
+When perceives some change in `value1`, the agent increments `value2` by executing the action `update_value2`. When perceives some change in `value2`, the agent increments `value1` by executing the action `update_value1`. When the agent perceives some change in the environemntal clock, it checks its internal clock and updates the environmental clock accordingly by executing the action `update_time`. These actions are realized by writing in ROS topics, s summarized in the table below:
+
+| Action        | Topic to write |
+|---------------|----------------|
+| update_value1 | value1         |
+| update_value2 | value2         |
+| update_time   | current_time   |
+
+
+
+The connection between agent's actions and perceptions is configured in a [yaml file](src/agt/sample_agent.yaml) with the same name as the agent, placed in the same folder as the asl file where the agent is specified.
 
 
 ## Running the example
