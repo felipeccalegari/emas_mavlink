@@ -26,7 +26,7 @@ The connection between agent's actions and perceptions is configured in a [yaml 
 -->
 - Java JRE >= 17
 
-Additional requirements depend on the method chosen set the simulation up (cf. sections 1.1 and 1.2 below).
+Additional requirements depend on the method chosen set the simulation up (cf. sections [4.1.1](https://github.com/embedded-mas/embedded-mas/edit/master/examples/jacamo/ros/perception_action_serviceAction/README.md#411-container-based-setup-recommended) and [4.1.2](https://github.com/embedded-mas/embedded-mas/edit/master/examples/jacamo/ros/perception_action_serviceAction/README.md#412-local-setup) below).
 
 <!-- 2. 
 3. Turtlesim ROS-based simulator infrastructure, available in some of the following options:   
