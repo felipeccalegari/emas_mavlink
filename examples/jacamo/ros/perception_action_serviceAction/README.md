@@ -1,8 +1,8 @@
-# Application overview
+# 1. Application overview
 This application example example illustrates agent actions that realized through requests to ROS services.
 
-# Scenario
-This application contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```, which moves a simulated turtle-shaped robot controlled by ROS. This service does not have a response message. <!--Actions based on services without response handling are triggered by the ```move_turtle``` internal action. -->
+# 2. Application Scenario
+This application contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```, which moves a simulated turtle-shaped robot controlled by ROS. This service does not have a response value. <!--Actions based on services without response handling are triggered by the ```move_turtle``` internal action. -->
 
 To illustrate actions that consider the service responses, the agent also executes the action ```do_get_loggers```.  This action is concretely realized through the ROS service ```/turtlesim/get_loggers```. This service produces a response, which the agent prints in the console. Notice that the service ```get_loggers``` is only available in ROS 1. 
 
@@ -14,9 +14,12 @@ The relation between agent's action and ROS services is summarized in the table 
 | do_get_loggers   | /turtlesim/get_loggers     |
 
 
+Besides the agent's actions, its perceptions are also connected with ROS. In particular, the agent acquires the perception `turtle_position` from the ROS topic `turtle1/pose`.
+
+The connection between agent's actions and perceptions is configured in a [yaml file](src/agt/sample_agent.yaml) with the same name as the agent, placed in the same folder as the asl file where the agent is specified.
 
 
-# Requirements
+# 3. Requirements
 <!-- 1. ROS (recommended [ROS Noetic](http://wiki.ros.org/noetic) or [ROS 2 Humble](https://docs.ros.org/en/humble/index.html))
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
@@ -30,16 +33,16 @@ Additional requirements depend on the method chosen set the simulation up (cf. s
   2.1. [Docker](https://www.docker.com/) (recommended - in the case of container-based simulation setup)   or  
   2.2.  (in the case of local simulation setup)  -->
 
-# Running the example
+# 4. Running the example
 Running the example requires two main steps:  
-1. Launch the simulation (cf. Section 1 below)
-2. Launch the JaCaMo application (cf. Section 2 below)
+1. Launch the simulation (cf. Section 4.1 below)
+2. Launch the JaCaMo application (cf. Section 4.2 below)
 
 
-## 1. Simulation setup:
+## 4.1. Simulation setup:
 It is possible to choose between a container-based setup (recommended - only Docker is required) and a local setup (ROS core and related tools are required).
 
-### 1.1 Container-based setup (recommended): 
+### 4.1.1 Container-based setup (recommended): 
 Requirements: [Docker](https://www.docker.com/)
 
 First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
@@ -75,19 +78,19 @@ sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setu
 ```
 -->
 
-### 1.2 Local setup:
+### 4.1.2 Local setup:
 
 Requirements: [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim)
 
 
 To run the ROS node in your computer, run the following steps:
 
-#### 1.2.1  Start the roscore:
+#### 4.1.2.1  Start the roscore:
 ROS 1: ``` roscore ```
 
 ROS 2: this step is not requred.
 
-#### 1.2.2. Launch the bridge between ROS and Java
+#### 4.1.2.2. Launch the bridge between ROS and Java
 ROS 1:
 ```
 roslaunch rosbridge_server rosbridge_websocket.launch
@@ -98,7 +101,7 @@ ROS 2:
 ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 ```
 
-#### 1.2.3. Launch the turtlesim simulation
+#### 4.1.2.3. Launch the turtlesim simulation
 ROS 1: 
 ```
 rosrun turtlesim turtlesim_node
@@ -110,7 +113,7 @@ ros2 run turtlesim turtlesim_node
 
 
 
-## 2. Launch the JaCaMo application:
+## 4.2. Launch the JaCaMo application:
 
 Linux:
 ```
@@ -121,7 +124,7 @@ Windows:
 gradlew run 
 ```
 
-## Some notes on the ROS-Jason integration
+# 5. Some notes on the ROS-Jason integration
 This integration is part of a broader integration framework available [here](https://github.com/embedded-mas/embedded-mas)
 
 Agents are configured in the jcm file (in this example, [perception_action.jcm](perception_action.jcm)). This example has what we call a <em>cyber-physical agent</em>, which is a software agent that includes physical elements. It may get perceptions from sensors while its actions' repertory may include those enabled by physical actuators. In this example, sensors and actuators are simulated and controlled by ROS. Cyber-physical agents are implemented by the class [`CyberPhysicalAgent`](https://github.com/embedded-mas/embedded-mas/blob/master/src/main/java/embedded/mas/bridges/jacamo/CyberPhysicalAgent.java), that extends [Jason Agents](https://github.com/jason-lang/jason/blob/master/src/main/java/jason/asSemantics/Agent.java). The physical portion of cyber-physical agents is set up in a yaml file with the same name and placed in the same folder as the asl file where the agent is specified. In this example, this file is placed [here](src/agt/sample_agent.yaml).
