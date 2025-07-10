@@ -21,10 +21,14 @@ The relation between agent's action and ROS services is summarized in the table 
 2. [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge)
 3. [Turtlesim](http://wiki.ros.org/turtlesim)
 -->
-1. Java JRE >= 17
-2. Turtlesim ROS-based simulator infrastructure, available in some of the following options:   
+- Java JRE >= 17
+
+Additional requirements depend on the method chosen set the simulation up (cf. sections 1.1 and 1.2 below).
+
+<!-- 2. 
+3. Turtlesim ROS-based simulator infrastructure, available in some of the following options:   
   2.1. [Docker](https://www.docker.com/) (recommended - in the case of container-based simulation setup)   or  
-  2.2. [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim) (in the case of local simulation setup)  
+  2.2.  (in the case of local simulation setup)  -->
 
 # Running the example
 
@@ -32,7 +36,7 @@ The relation between agent's action and ROS services is summarized in the table 
 ## 1. Simulation setup:
 It is possible to choose between a container-based setup (recommended - only Docker is required) and a local setup (ROS core and related tools are required).
 
-### 1.1 Container-based setup: 
+### 1.1 Container-based setup (recommended): 
 Requirements: [Docker](https://www.docker.com/)
 
 First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
@@ -69,6 +73,9 @@ sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setu
 -->
 
 ### 1.2 Local setup:
+
+Requirements: [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim)
+
 
 To run the ROS node in your computer, run the following steps:
 
