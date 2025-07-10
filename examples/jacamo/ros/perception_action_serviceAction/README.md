@@ -26,7 +26,7 @@ The connection between agent's actions and perceptions is configured in a [yaml 
 -->
 - Java JRE >= 17
 
-Additional requirements depend on the method chosen set the simulation up (cf. sections [4.1.1](https://github.com/embedded-mas/embedded-mas/edit/master/examples/jacamo/ros/perception_action_serviceAction/README.md#411-container-based-setup-recommended) and [4.1.2](https://github.com/embedded-mas/embedded-mas/edit/master/examples/jacamo/ros/perception_action_serviceAction/README.md#412-local-setup) below).
+Additional requirements depend on the method chosen set the simulation up (cf. sections 4.1.1 and 4.1.2 below).
 
 <!-- 2. 
 3. Turtlesim ROS-based simulator infrastructure, available in some of the following options:   
@@ -83,7 +83,7 @@ sudo docker exec  embedded-mas-example /bin/bash -c "source /opt/ros/humble/setu
 Requirements: [ROS](https://www.ros.org/), [Rosbridge](http://wiki.ros.org/rosbridge_suite/Tutorials/RunningRosbridge), and [Turtlesim](http://wiki.ros.org/turtlesim)
 
 
-To run the ROS node in your computer, run the following steps:
+Run the ROS node on your computer by following these steps:
 
 #### 4.1.2.1  Start the roscore:
 ROS 1: ``` roscore ```
