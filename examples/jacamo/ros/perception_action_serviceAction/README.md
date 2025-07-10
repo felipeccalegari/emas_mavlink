@@ -31,6 +31,9 @@ Additional requirements depend on the method chosen set the simulation up (cf. s
   2.2.  (in the case of local simulation setup)  -->
 
 # Running the example
+Running the example requires two main steps:  
+1. Launch the simulation (cf. Section 1 below)
+2. Launch the JaCaMo application (cf. Section 2 below)
 
 
 ## 1. Simulation setup:
