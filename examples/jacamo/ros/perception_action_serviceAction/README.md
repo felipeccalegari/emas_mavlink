@@ -1,5 +1,5 @@
 # 1. Application overview
-This application example example illustrates agent actions that realized through requests to ROS services.
+This application example illustrates an agent whose (i) beliefs include values read from ROS topics and (ii) actions are realized through requests to ROS services.
 
 # 2. Application Scenario
 This application contains a randomly moving turtle agent (see the agent code [here](src/agt/sample_agent.asl)). The turtle agent moves itself by executing the action ```move_turtle```. This action is concretely realized through the ROS service ```/turtle1/teleport_relative```, which moves a simulated turtle-shaped robot controlled by ROS. This service does not have a response value. <!--Actions based on services without response handling are triggered by the ```move_turtle``` internal action. -->
