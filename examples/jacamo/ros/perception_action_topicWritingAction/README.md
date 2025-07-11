@@ -25,12 +25,22 @@ When perceives some change in `value1`, the agent increments `value2` by executi
 The connection between agent's actions and perceptions is configured in a [yaml file](src/agt/sample_agent.yaml) with the same name as the agent, placed in the same folder as the asl file where the agent is specified.
 
 
-## Running the example
+# 3. Requirements
+- Java JRE >= 17
 
-### 1. Ros node setup:
-It is possible to choose between a container-based setup (only Docker is required) and a local setup (ROS core and related tools are required).
+Additional requirements depend on the method chosen set the simulation up (cf. sections 4.1.1 and 4.1.2 below).
 
-#### 1.1 Container-based setup: 
+# 4. Running the example
+Running the example requires two main steps:  
+1. Launch the ROS infrastructure (cf. Section 4.1 below)
+2. Launch the JaCaMo application (cf. Section 4.2 below)
+
+
+### 4.1. Ros node setup:
+
+It is possible to choose between a container-based setup (recommended - only Docker is required) and a local setup (ROS core and related tools are required).
+
+#### 4.1.1 Container-based setup: 
 Requirements: [Docker](https://www.docker.com/)
 
 Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
