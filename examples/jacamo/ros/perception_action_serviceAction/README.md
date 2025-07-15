@@ -45,7 +45,7 @@ It is possible to choose between a container-based setup (recommended - only Doc
 ### 4.1.1 Container-based setup (recommended): 
 Requirements: [Docker](https://www.docker.com/)
 
-First of all, make sure that there is no container named ```novnc```, ```roscore```, or ```embedded-mas-example```. Then, use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 - ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
 - ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
 
