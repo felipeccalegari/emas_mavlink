@@ -1,5 +1,5 @@
 # 1. Application overview
-This application example illustrates an agent (see the agent code [here](src/agt/sample_agent.asl)) whose (i) beliefs include values read from ROS topics and (ii) actions are realized by writing in ROS topics.
+This application example illustrates an agent (see the agent code [here](src/agt/sample_agent.asl)) whose (i) beliefs include values read from ROS topics and (ii) actions are realized by writing in the same topics. The agent prints in the console every change in the beliefs acquired from ROS.
 
 # 2. Application Scenario
 The application contains an agent that monitors two values from the environment, called `value1` and `value2`. These values are represented in the agent's mind by the beliefs `value1(V)` and `value2(V)` (s.t `V` is the perceived value). Besides, the agent perceives the current time from a clock available in the environment. This time is represented in the agent's mind by the belief `current_hour(V)` (where `V`is the current time). These perceptions/beliefs are obtained from ROS topics, as summarized in the table below:
@@ -23,6 +23,8 @@ When perceives some change in `value1`, the agent increments `value2` by executi
 
 
 The connection between agent's actions and perceptions is configured in a [yaml file](src/agt/sample_agent.yaml) with the same name as the agent, placed in the same folder as the asl file where the agent is specified.
+
+
 
 
 # 3. Requirements
