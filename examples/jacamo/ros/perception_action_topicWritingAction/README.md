@@ -43,7 +43,7 @@ It is possible to choose between a container-based setup (recommended - only Doc
 #### 4.1.1 Container-based setup: 
 Requirements: [Docker](https://www.docker.com/)
 
-Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+<!-- Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
 ##### 1.1.1 ROS 1: 
 
    ```
@@ -72,7 +72,11 @@ sudo docker run -it -p9090:9090 --rm --net=ros --name noetic maiquelb/embedded-m
               )&& ros2 launch rosbridge_server rosbridge_websocket_launch.xml\
              "
 ```
+-->
 
+Use the following commands to launch the nodes either in ROS 1 or in ROS 2:
+- ROS 1: ```./launch_ros1.sh``` (preceed with ```sudo``` if needed)
+- ROS 2: ```./launch_ros2.sh``` (preceed with ```sudo``` if needed)
 
 #### 1.2 Local setup: 
 Requirements
@@ -113,7 +117,7 @@ ros2 topic pub --once /current_time std_msgs/String \"{\"data\": \"unknown\"}\"
 
 
 
-### 2. Launch the JaCaMo application:
+### 4.2. Launch the JaCaMo application:
 
 #### Linux:
 ```
