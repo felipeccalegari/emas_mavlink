@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 
 public class ServiceParam {
-	
-	private String paramName;
-	private Object paramValue;
+
+	protected String paramName;
+	protected Object paramValue;
 
 
 
@@ -54,8 +54,11 @@ public class ServiceParam {
 						else
 							if(paramValue.equals("off"))  
 								pValue = "0";
-							else 								
-								pValue = pValue + "\"" + paramValue.toString() + "\"" ;
+							else
+								if(paramValue.equals(""))
+									pValue = pValue + "";
+								else
+									pValue = pValue + "\"" + paramValue.toString() + "\"" ;
 					}
 					else
 						pValue = paramValue.toString();
