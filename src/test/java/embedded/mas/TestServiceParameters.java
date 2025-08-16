@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import embedded.mas.bridges.ros.ServiceArrayParam;
 import embedded.mas.bridges.ros.ServiceParam;
 import embedded.mas.bridges.ros.ServiceParameters;
 import jason.asSyntax.ListTermImpl;
@@ -92,7 +93,6 @@ public class TestServiceParameters {
 		params.remove(params.size()-1);
 		params.add(p2);
 		
-		System.out.println(params.toJson());
 		
 		assertTrue(params.toJson().toString().equals("{\"linear\":{\"x\":null,\"y\":null,\"z\":null},\"test\":null,\"angular\":{\"x\":null,\"y\":null,\"z\":null}}"));	
 		
@@ -105,10 +105,66 @@ public class TestServiceParameters {
 		list.add(nestedList1);
 		list.add(new NumberTermImpl(123));
 		list.add(nestedList2);
-		System.out.println(list);
 		
 		assertTrue("It must accept array of params with same size of the list of service params",params.setValues(list.toArray())); 		
 		assertTrue(params.toJson().toString().equals("{\"linear\":{\"x\":1,\"y\":2,\"z\":3},\"test\":123,\"angular\":{\"x\":11,\"y\":22,\"z\":33}}"));
+		
+	}
+	
+	@Test
+	public void testSetValuesArrayParam() {
+		////create the following list of parameters: [0.1, [[1,2,3],[4,5,6]],0.2]
+		ListTermImpl list = new ListTermImpl();
+		
+		ListTermImpl arrayParam = new ListTermImpl();
+				
+		ListTermImpl nestedList1 = new ListTermImpl();
+		nestedList1.add(new NumberTermImpl(1));
+		nestedList1.add(new NumberTermImpl(2));
+		nestedList1.add(new NumberTermImpl(3));		
+		ListTermImpl nestedList2 = new ListTermImpl();
+		nestedList2.add(new NumberTermImpl(4));
+		nestedList2.add(new NumberTermImpl(5));
+		nestedList2.add(new NumberTermImpl(6));
+		
+		arrayParam.add(nestedList1);
+		arrayParam.add(nestedList2);
+		
+		list.add(new NumberTermImpl(0.1));
+		list.add(arrayParam);
+		list.add(new NumberTermImpl(0.2));
+		
+		System.out.println("LIST:  " + list);
+		
+		ServiceParam y11 = new ServiceParam("y11", 1);
+		ServiceParam y12 = new ServiceParam("y12", 2);
+		ServiceParam y13 = new ServiceParam("y13", 3);
+		ServiceParameters y1 = new ServiceParameters();
+		y1.add(y11); y1.add(y12); y1.add(y13);
+		
+		ServiceParam y21 = new ServiceParam("y21", 1);
+		ServiceParam y22 = new ServiceParam("y22", 2);
+		ServiceParam y23 = new ServiceParam("y23", 3);
+		ServiceParameters y2 = new ServiceParameters();
+		y2.add(y21); y2.add(y22); y2.add(y23);
+		
+		ServiceParameters parametersY = new ServiceParameters();
+		parametersY.add(new ServiceParam("par1", y1));
+		parametersY.add(new ServiceParam("par2", y2));
+		
+		ServiceArrayParam y = new ServiceArrayParam("y", parametersY);
+		
+		ServiceParameters parameters = new ServiceParameters();
+		parameters.add(new ServiceParam("x", 0.1));
+		parameters.add(y);
+		parameters.add(new ServiceParam("z", 0.2));
+		
+		System.out.println(">>>" + parameters.toJson());
+		
+		parameters.setValues(list.toArray());
+		
+		System.out.println("+++" + parameters.toJson());
+		
 		
 	}
 }
