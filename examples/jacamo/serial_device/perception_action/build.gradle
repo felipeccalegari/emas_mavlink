@@ -31,8 +31,7 @@ repositories {
 
 dependencies {
     implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
-    implementation "embedded-mas:embedded-mas:0.056-SNAPSHOT" 
-    implementation "javard:javard:0.032-SNAPSHOT"
+    implementation "embedded-mas:embedded-mas:0.061-SNAPSHOT" 
 }
 
 sourceSets {
@@ -60,35 +59,6 @@ task run (type: JavaExec, dependsOn: 'classes') {
     classpath sourceSets.main.runtimeClasspath
 }
 
-
-task uberJar(type: Jar, dependsOn: 'classes') {
-    group      ' JaCaMo'
-    description 'creates a single runnable jar file with all dependencies'
-
-    manifest {
-        attributes 'Main-Class': 'jacamo.infra.JaCaMoLauncher'
-    }
-    baseName = 'jacamo-architecture_1' // the name must start with jacamo so that jacamo...jar is found in the classpath
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    from (project.projectDir.absolutePath) {
-        include '**/*.asl'
-        include '**/*.xml'
-        include '**/*.jcm'
-        include '*.properties'
-    }
-    from (project.buildDir.absolutePath + '/jcm') {
-        include '**/*'
-    }
-    with jar
-
-    doFirst {
-        copy {
-            from 'architecture_1.jcm'
-            rename 'architecture_1.jcm','default.jcm'
-            into project.buildDir.absolutePath + '/jcm'
-        }
-    }
-}
 
 task buildJCMDeps (type: JavaExec, dependsOn: 'classes') {
     mainClass = 'jacamo.infra.RunJaCaMoProject'
