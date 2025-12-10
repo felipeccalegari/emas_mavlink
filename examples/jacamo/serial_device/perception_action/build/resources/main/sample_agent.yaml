@@ -1,0 +1,34 @@
+--- # Devices
+- device_id: arduino1
+  className: embedded.mas.bridges.jacamo.JSONWatcherDevice
+  microcontroller: 
+      id: arduino1
+      className: NRJ4EmbeddedMas
+      serial: "/dev/ttyAMA0"
+      baudRate: 57600       
+  serialActions:
+      - actionName: arming
+        actuationName: MAV_CMD_COMPONENT_ARM_DISARM
+      - actionName: takeoff
+        actuationName: MAV_CMD_NAV_TAKEOFF
+      - actionName: set_mode
+        actuationName: SET_MODE # MAV_CMD_DO_SET_MODE is not supported px4 >= 1.15
+      - actionName: waypoint
+        actuationName: MAV_CMD_NAV_WAYPOINT
+      - actionName: rtl
+        actuationName: MAV_CMD_NAV_RETURN_TO_LAUNCH
+      - actionName: land
+        actuationName: MAV_CMD_NAV_LAND
+      # New – local setpoint
+      - actionName: sp_local
+        actuationName: SET_POSITION_TARGET_LOCAL_NED
+      # New – attitude target
+      - actionName: attitude_target
+        actuationName: SET_ATTITUDE_TARGET
+      # New – actuator controls
+      - actionName: actuators
+        actuationName: ACTUATOR_CONTROL_TARGET
+      - actionName: mission_start
+        actuationName: MAV_CMD_MISSION_START
+      - actionName: mission_item
+        actuationName: MISSION_ITEM_INT
