@@ -25,5 +25,6 @@ Customized NRJ4EmbeddedMas and SerialDevice classes from Embedded-Mas framework 
   - Set mode with OFFBOARD option.
   - Commands from MAVLink dialect that don't start with "MAV_CMD_*" need to be tested.
 
-*After PX4 v1.15, they stopped using MAV_CMD_DO_SET_MODE to be replaced by STANDARD, but can't be found on _common.xml_ dialects, therefore, i'm using SET_MODE (which is deprecated) to work properly with different modes.
-*Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters - NRJ class automatically converts them into _Waypoint_ MAVLink command.
+- After PX4 v1.15, they stopped using MAV_CMD_DO_SET_MODE to be replaced by STANDARD, but can't be found on _common.xml_ dialects, therefore, i'm using SET_MODE (which is deprecated) to work properly with different modes.
+
+- Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters, which by default uses its own standards but the NRJ class will automatically multiply the Lat and Lon coordinates by multiplier so Agent Programmer only needs to insert normal degrees (eg. 45.273333) instead of a large number. Also NRJ class automatically converts the "Missions" into _Waypoint_ MAVLink command.
