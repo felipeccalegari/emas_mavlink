@@ -2,45 +2,85 @@
    This example has two possible behaviours: proactive and reactive.
    Uncomment the desired version and comment the other one to test the different approaches.  
 */
+//!start.
+/* +!start
+   <- .print("Sending message from Pi 5 to Pi 4...");
+      .arming(1,0);
+      .wait(1000);
+      .print("Arming command sent.");
+      .wait(1000);
+      .set_mode(1,4,2);
+      .wait(1000);
+      .print("Set mode command sent and will takeoff to default altitude.");
+      .wait(5000).
+      //.print("Sending takeoff command...");
+      //.takeoff(0, 0, 0, 0, 0, 0, 10);
+      //.wait(1000);
+      //.print("Takeoff command sent.");
+      //!start.
+!start.
+ */
+/* !start.
++!start
+   <- .print("Sending message from Pi 5 to Pi 4...");
+      .arming(1,0);
+      .wait(1000);
+      .print("Arming command sent.");
+      .set_mode(1,4,2);  // AUTO.TAKEOFF on PX4
+      .wait(10000);
+      .print("AUTO.TAKEOFF requested.");
+      .waypoint(-1,1,0,0,1,2,3); // DO_REPOSITION, z=3
+      .wait(2000);
+      .waypoint(-1,1,0,0,2,2,3); // DO_REPOSITION, z=3
+      .wait(2000);
+      .waypoint(-1,1,0,0,5,2,3); // DO_REPOSITION, z=3
+      .wait(2000);
+      .waypoint(-1,1,0,0,0,0,3); // DO_REPOSITION, z=3
+      .wait(2000);
+      .rtl(0,0,0,0,0,0,0);
+      .wait(5000);
+      .land(0,0,0,0,0,0,0);
+      .print("Landing command sent."). */
+
+/* !setpoint.
++!setpoint : true
+   <- .sp_local(0, 1, 1,1,2040,0, 0,-10, 0, 0, 0,0, 0, 0, 0,0);
+      !setpoint.
 
 
-
-// ***************************************************************************************************************************************
-// Reactive version - the agent reacts to perceptions about the light state.
-// ***************************************************************************************************************************************
-+light_state(0)
-   <- .print("The light A is off. I must turn it on");
-       embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("arduino1","lightOn",[]).
+!arm.
++!arm : true
+   <- .arming(1,0).
+ */
 
 
-+light_state(1) <- .print("The light A is on. It is fine").
+!start.
++!start <-
+
+    .print("ARMING...");
+    .arming(1,0);
+    .wait(1200);
+
+    .print("SET MODE → AUTO.MISSION...");
+    .set_mode(1,4,4);   // custom_mode=4 = AUTO.MISSION
+    .wait(800);
+
+    .print("MISSION: TAKEOFF item seq=0...");
+    .mission_item(47.3977419, 8.5455938, 7);
+
+    .print("MISSION: adding waypoints...");
+    .mission_item(47.3977569, 8.5456338, 7);
+    .mission_item(47.3977919, 8.5456438, 7);
+    .mission_item(47.3977869, 8.5456538, 7);
+    .mission_item(47.3978959, 8.5457348, 7);
+    .mission_item(47.3977869, 8.5456538, 7);
+    .wait(500);
+
+    .print("MISSION: upload + start...");
+    .mission_start(0,-1);
+    .wait(50000);
+    .print("Landing...");
+    .land(0,0,0,0,0,0,0);
+    .print("Landed.").
 
 
-
-/*
-
-// ***************************************************************************************************************************************
-// Proactive version - the agent constantly pursues the goal to keep the lights on, with different plans for different circumstances
-// ***************************************************************************************************************************************
-
-!light_on. //the agent has the goal to keep the light on
-
-//plan to satisfy the goal light_on when the light is already on
-+!light_on : light_state(1) 
-   <- .print("The light A is on. It is fine");
-      .wait(light_state(0));
-      !light_on.
-
-//plan to satisfy the goal light_on when the light is off
-+!light_on : light_state(0) 
-   <- .print("The light A is off. I must turn it on");
-      embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction("arduino1","lightOn",[]);
-      .wait(light_state(1));
-      !light_on.       
-
-
-//plan to satisfy the goal light_on when the light is off
--!light_on 
-    <-.wait(500);
-      !light_on.
-*/
