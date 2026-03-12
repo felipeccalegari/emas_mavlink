@@ -54,7 +54,7 @@
  */
 
 
-!start.
+/* !start.
 +!start <-
 
     .print("ARMING...");
@@ -78,9 +78,42 @@
 
     .print("MISSION: upload + start...");
     .mission_start(0,-1);
+    
     .wait(50000);
     .print("Landing...");
     .land(0,0,0,0,0,0,0);
     .print("Landed.").
 
+ */
+!start.
++!start <-
+    .print("ARMING...");
+    .arming(1,0);
+    .wait(1200);
 
+    .print("SET MODE - AUTO.MISSION...");
+    .set_mode(1,4,4);
+    .wait(800);
+
+    .print("MISSION: TAKEOFF...");
+    .mission_item(47.3977419, 8.5455938, 7);
+    .print("MISSION: adding waypoints...");
+    .mission_item(47.3977569, 8.5456338, 7);
+    .mission_item(47.3977919, 8.5456438, 7);
+    .mission_item(47.3977869, 8.5456538, 7);
+    .mission_item(47.3978959, 8.5457348, 7);
+    .mission_item(47.3977869, 8.5456538, 7);
+    .wait(500);
+
+    .print("MISSION: upload + start...");
+    .mission_start(0,-1);
+    .wait(50000);
+
+    .print("Landing...");
+    .land(0,0,0,0,0,0,0);
+    .print("Landed.").
+
+
++globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
+   <-
+    .print("[GPS] lat=",Lat," lon=",Lon," alt=",Alt," relAlt=",RelAlt).
