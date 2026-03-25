@@ -1,0 +1,17 @@
+[sample_agent] Starting TAKEOFF + REPOSITION Z counter...
+[sample_agent] Error in internal action '.arming(1,21196)' (file:src/agt/sample_agent.asl:7): Device arduino1 not found.
+java.lang.Exception: Device arduino1 not found.
+	at embedded.mas.bridges.jacamo.defaultEmbeddedInternalAction.execute(defaultEmbeddedInternalAction.java:59)
+	at jason.stdlib.arming.execute(arming.java:21)
+	at jason.asSemantics.TransitionSystem.applyExecInt(TransitionSystem.java:760)
+	at jason.asSemantics.TransitionSystem.applySemanticRuleAct(TransitionSystem.java:243)
+	at jason.asSemantics.TransitionSystem.act(TransitionSystem.java:1505)
+	at jason.infra.centralised.CentralisedAgArch.act(CentralisedAgArch.java:239)
+	at jason.infra.centralised.CentralisedAgArch.reasoningCycle(CentralisedAgArch.java:250)
+	at jason.infra.centralised.CentralisedAgArch.run(CentralisedAgArch.java:271)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[sample_agent] No failure event was generated for +!start[code(.arming(1,21196)),code_line(7),code_src("file:src/agt/sample_agent.asl"),error(unknown),error_msg(""),source(self)]
+intention 1: 
+    +!start[source(self)] <- ... .arming(1,21196); .wait(300); -+awaiting_z(1); .takeoff(0,0,0,0,47.397971,8.5461637,1) / {}
+

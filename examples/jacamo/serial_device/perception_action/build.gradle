@@ -6,8 +6,8 @@ apply plugin: 'eclipse'
 version '1.0'
 group   'org.jacamo'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 repositories {
     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
@@ -22,18 +22,13 @@ repositories {
     mavenCentral()
 }
 
+def emasJar = file("${rootDir}/../../../../build/libs/embedded-mas-0.061-mavlink.jar")
+
 dependencies {
     implementation 'org.jacamo:jacamo:0.10-SNAPSHOT'
-    //implementation "embedded-mas:embedded-mas:0.061-SNAPSHOT" 
-    implementation files('/home/agentes/mavlink_emas/embedded-mas/build/libs/embedded-mas-0.061-mavlink.jar')
-
-    // other dependencies...
-    /* implementation 'io.dronefleet.mavlink:mavlink:1.1.11'
-    implementation 'com.fazecast:jSerialComm:2.10.4'
-    implementation 'org.yaml:snakeyaml:1.33'
-    implementation 'com.neuronrobotics:nrjavaserial:5.2.1' */
-    
+    implementation files(emasJar)
 }
+
 
 sourceSets {
     main {
@@ -70,6 +65,7 @@ task run (type: JavaExec, dependsOn: ['compileGeneratedInternalActions','classes
     mainClass = 'jacamo.infra.JaCaMoLauncher'
     args 'perception_action.jcm'
     // jvmArgs '-Xss15m'
+    jvmArgs '-Dgnu.io.rxtx.SerialPorts=/dev/ttyV0:/dev/ttyV1'
     classpath sourceSets.main.runtimeClasspath
 }
 
@@ -78,11 +74,13 @@ task run (type: JavaExec, dependsOn: ['compileGeneratedInternalActions','classes
 task generateInternalActions(type: JavaExec) {
     group = 'Application'
     description = 'Generate internal actions corresponding to actions specidied in the yaml files'
-    //classpath = sourceSets.main.runtimeClasspath
-    classpath = sourceSets.main.runtimeClasspath + files('/home/agentes/mavlink_emas/embedded-mas/build/libs/embedded-mas-0.061-mavlink.jar')
+    classpath = sourceSets.main.runtimeClasspath
     main = 'embedded.mas.bridges.jacamo.InternalActionGenerator'
+    inputs.files(fileTree('src/agt') { include '**/*.yaml' })
     outputs.dir 'src/java/jason/stdlib'
+    outputs.upToDateWhen { false }
 }
+
 
 
 // Compile internal actions

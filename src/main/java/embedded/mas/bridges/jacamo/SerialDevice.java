@@ -51,7 +51,6 @@ public class SerialDevice extends DefaultDevice {
 					message = actuationName;
 				}
 
-				System.out.println("[SerialDevice] Sending to microcontroller: " + message);
 				return this.getMicrocontroller().write(message);
 			}
 
@@ -86,6 +85,5 @@ public class SerialDevice extends DefaultDevice {
 	}
 	
 }
-
 
 

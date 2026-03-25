@@ -7,7 +7,6 @@ import java.util.List;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -50,9 +49,10 @@ public class MicrocontrollerMonitor extends Thread {
 			}
 			
 			try {
-				Thread.sleep((long)(Math.random() * 1000));
+				Thread.sleep(5);
 			} catch (InterruptedException e2) {
-				e2.printStackTrace();
+				Thread.currentThread().interrupt();
+				return;
 			}
 		}
 	}

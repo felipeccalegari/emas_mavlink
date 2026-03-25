@@ -52,6 +52,7 @@ import embedded.mas.bridges.jacamo.actuation.ActuationSequence;
 import embedded.mas.bridges.jacamo.actuation.ActuationSet;
 import embedded.mas.bridges.jacamo.actuation.Actuator;
 import embedded.mas.bridges.javard.Arduino4EmbeddedMas;
+import embedded.mas.bridges.javard.Mavlink4EmbeddedMas;
 import embedded.mas.bridges.javard.NRJ4EmbeddedMas;
 import embedded.mas.bridges.ros.DefaultRos4Bdi;
 import embedded.mas.bridges.ros.DefaultRos4EmbeddedMas;
@@ -100,6 +101,20 @@ public class DefaultConfig {
 		return a;
 	}
 
+	private Mavlink4EmbeddedMas createMavlink4EmbeddedMas(String serialPort, int baudRate) {
+		Mavlink4EmbeddedMas a = null;
+		try {
+			a = new Mavlink4EmbeddedMas(serialPort, baudRate);
+		} catch (NoSuchPortException e) {
+			e.printStackTrace();
+		} catch (PortInUseException e) {
+			e.printStackTrace();
+		} catch (UnsupportedCommOperationException e) {
+			e.printStackTrace();
+		}
+		return a;
+	}
+
 	private DefaultRos4EmbeddedMas createRos4EmbeddedMas(String connectionStr, ArrayList<String> topics, ArrayList<String> types, ArrayList<String> beliefNames, HashMap<String, ArrayList<String>> paramsToIgnore) {
 		return new DefaultRos4EmbeddedMas(connectionStr, topics, types, beliefNames, paramsToIgnore);
 
@@ -116,38 +131,29 @@ public class DefaultConfig {
 
 	}
 
-	public <T> boolean isExternalInterface(Class<T> className){
+	public boolean isExternalInterface(Class<?> className){
+		if(className == null) return false;
 		Class[] classes = className.getInterfaces();
-		if(classes.length == 0) return false;		
-		for(int i=0;i<classes.length;i++) { 
+		for(int i=0;i<classes.length;i++) {
 			if(classes[i] == IExternalInterface.class) return true;
-			return isExternalInterface(classes[0]);
+			if(isExternalInterface(classes[i])) return true;
 		}
-		return false;
+		return isExternalInterface(className.getSuperclass());
 	}
 
-	public <T> Class  getIExternalDevice(Class<T> className){
+	public Class getIExternalDevice(Class<?> className){
+		if(className == null) return null;
 		Class[] classes = className.getInterfaces();
 		if(classes.length>0) {
-			/*//example access 1
-			System.out.println("????" + className.getName() + " - " + className.getInterfaces().length + " - " + className.getInterfaces()[0].getClass().toString());
-			System.out.println(
-					"Interfaces of myClass: "
-							+ Arrays.toString(
-									className.getInterfaces()));
-
-			Class[] classes = className.getInterfaces();
-			System.out.println( "Interfaces of myClass::: "  + Arrays.toString( classes));
-			System.out.println( "Interfaces of myClass:::::: "  + classes[0].getName() );
-
-			getInterface(classes[0]);
-			 */
-
-			for(int i=0;i<classes.length;i++) 
+			for(int i=0;i<classes.length;i++) {
+				if(classes[i] == IExternalInterface.class) {
+					return classes[i];
+				}
 				if(isExternalInterface(classes[i]))
-					return classes[i];			
+					return classes[i];
+			}
 		}
-		return null;
+		return getIExternalDevice(className.getSuperclass());
 
 	}
 
@@ -334,21 +340,32 @@ public class DefaultConfig {
 							}
 						}
 						else
-							if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
-								microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
-										Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
-								ArrayList actionsArray = (ArrayList) item.get("serialActions");
+								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("NRJ4EmbeddedMas")) {
+									microcontroller= createNRJ4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+											Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+									ArrayList actionsArray = (ArrayList) item.get("serialActions");
 								for(int j=0;j<actionsArray.size();j++) {
 									SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
 											createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
 									embeddedActionList.add(action);
 
 
+									}
 								}
-							}
-							else
-								//if the current device is a ros node
-								if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
+								else
+									if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("Mavlink4EmbeddedMas")) {
+										microcontroller= createMavlink4EmbeddedMas(((LinkedHashMap)item.get("microcontroller")).get("serial").toString(),
+												Integer.parseInt(((LinkedHashMap)item.get("microcontroller")).get("baudRate").toString()));
+										ArrayList actionsArray = (ArrayList) item.get("serialActions");
+										for(int j=0;j<actionsArray.size();j++) {
+											SerialEmbeddedAction action  = new SerialEmbeddedAction(createAtom(((LinkedHashMap)actionsArray.get(j)).get("actionName").toString() ), 
+													createAtom(((LinkedHashMap)actionsArray.get(j)).get("actuationName").toString()));
+											embeddedActionList.add(action);
+										}
+									}
+									else
+									//if the current device is a ros node
+									if(((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4EmbeddedMas")|
 										((LinkedHashMap)item.get("microcontroller")).get("className").equals("DefaultRos4Bdi")) { //DefaultRos4Bdi is just an alias class for the names to make more sense in Jason-ROS applications
 									//ArrayList perceptionTopics = (ArrayList) ((LinkedHashMap)item.get("microcontroller")).get("perceptionTopics");
 									ArrayList perceptionTopics = (ArrayList) item.get("perceptionTopics");

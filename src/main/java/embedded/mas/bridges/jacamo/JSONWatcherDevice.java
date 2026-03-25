@@ -42,8 +42,7 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 				listOfBeliefs.clear();
 			}
 		}
-		try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
-	return percepts;
+		return percepts;
 	}
 
 	@Override
