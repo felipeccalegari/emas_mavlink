@@ -31,12 +31,35 @@ public class SerialDevice extends DefaultDevice {
 
 	@Override
 	public boolean execEmbeddedAction(Atom actionName, Object[] args, Unifier un) {
-		EmbeddedAction action = getEmbeddedAction(actionName);		
-		if(action instanceof SerialEmbeddedAction) {
-			return this.getMicrocontroller().write(((SerialEmbeddedAction)action).getActuationName().toString());
+		try {
+			EmbeddedAction action = getEmbeddedAction(actionName);
+
+			if (action instanceof SerialEmbeddedAction) {
+				String actuationName = ((SerialEmbeddedAction) action).getActuationName().toString();
+
+				// Build the parameter string if args are present
+				String message;
+				if (args != null && args.length > 0) {
+					// Join args with commas and remove brackets/spaces if any
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < args.length; i++) {
+						sb.append(args[i].toString().trim());
+						if (i < args.length - 1) sb.append(",");
+					}
+					message = actuationName + "(" + sb.toString() + ")";
+				} else {
+					message = actuationName;
+				}
+
+				return this.getMicrocontroller().write(message);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return false;
 	}
+
 
 	@Override
 	public boolean execEmbeddedAction(String actionName, Object[] args, Unifier un)
@@ -62,6 +85,5 @@ public class SerialDevice extends DefaultDevice {
 	}
 	
 }
-
 
 

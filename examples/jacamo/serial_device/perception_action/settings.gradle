@@ -8,3 +8,9 @@
  */
 
 rootProject.name = 'architecture_1'
+
+includeBuild('../../../../') {
+    dependencySubstitution {
+        substitute module('embedded-mas:embedded-mas') using project(':')
+    }
+}
