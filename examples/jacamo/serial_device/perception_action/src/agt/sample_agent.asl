@@ -1,88 +1,4 @@
-//!start.
-/* +!start
-   <- .print("Sending message from Pi 5 to Pi 4...");
-      .arming(1,0);
-      .wait(1000);
-      .print("Arming command sent.");
-      .wait(1000);
-      .set_mode(1,4,2);
-      .wait(1000);
-      .print("Set mode command sent and will takeoff to default altitude.");
-      .wait(5000).
-      //.print("Sending takeoff command...");
-      //.takeoff(0, 0, 0, 0, 0, 0, 10);
-      //.wait(1000);
-      //.print("Takeoff command sent.");
-      //!start.
-!start.
- */
 /* !start.
-+!start
-   <- .print("Sending message from Pi 5 to Pi 4...");
-      .arming(1,0);
-      .wait(1000);
-      .print("Arming command sent.");
-      .set_mode(1,4,2);  // AUTO.TAKEOFF on PX4
-      .wait(10000);
-      .print("AUTO.TAKEOFF requested.");
-      .waypoint(-1,1,0,0,1,2,3); // DO_REPOSITION, z=3
-      .wait(2000);
-      .waypoint(-1,1,0,0,2,2,3); // DO_REPOSITION, z=3
-      .wait(2000);
-      .waypoint(-1,1,0,0,5,2,3); // DO_REPOSITION, z=3
-      .wait(2000);
-      .waypoint(-1,1,0,0,0,0,3); // DO_REPOSITION, z=3
-      .wait(2000);
-      .rtl(0,0,0,0,0,0,0);
-      .wait(5000);
-      .land(0,0,0,0,0,0,0);
-      .print("Landing command sent."). */
-
-/* !setpoint.
-+!setpoint : true
-   <- .sp_local(0, 1, 1,1,2040,0, 0,-10, 0, 0, 0,0, 0, 0, 0,0);
-      !setpoint.
-
-
-!arm.
-+!arm : true
-   <- .arming(1,0).
- */
-
-
-/* !start.
-+!start <-
-
-    .print("ARMING...");
-    .arming(1,0);
-    .wait(1200);
-
-    .print("SET MODE → AUTO.MISSION...");
-    .set_mode(1,4,4);   // custom_mode=4 = AUTO.MISSION
-    .wait(800);
-
-    .print("MISSION: TAKEOFF item seq=0...");
-    .mission_item(47.3977419, 8.5455938, 7);
-
-    .print("MISSION: adding waypoints...");
-    .mission_item(47.3977569, 8.5456338, 7);
-    .mission_item(47.3977919, 8.5456438, 7);
-    .mission_item(47.3977869, 8.5456538, 7);
-    .mission_item(47.3978959, 8.5457348, 7);
-    .mission_item(47.3977869, 8.5456538, 7);
-    .wait(500);
-
-    .print("MISSION: upload + start...");
-    .mission_start(0,-1);
-    .wait(50000);
-    .print("Landing...");
-    .land(0,0,0,0,0,0,0);
-    .print("Landed.").
-
- */
-
-
-!start.
 
 +!start <-
     -awaiting_z(_);
@@ -111,4 +27,55 @@
             .print("Reposition Z counter finished.");
         };
     };
-    -step_transitioning(_).
+    -step_transitioning(_). */
+
+/* Visible MAVLink examples for PX4 SITL. */
+
+/* !demo_takeoff_land.
++!demo_takeoff_land <-
+    .print("Demo: arm -> takeoff -> land.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 3.0);
+    .wait(8000);
+    .land(0, 0, 0, 0, 47.3979710, 8.5461637, 0.0). */
+
+/* !demo_takeoff_rtl.
++!demo_takeoff_rtl <-
+    .print("Demo: arm -> takeoff -> RTL.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(8000);
+    .rtl. */
+
+/* !demo_square.
++!demo_square <-
+    .print("Demo: arm -> takeoff -> 3 reposition steps -> land.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(7000);
+    .reposition(-1, 1, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(4000);
+    .reposition(-1, 1, 0, 0, 47.3980210, 8.5461637, 4.0);
+    .wait(4000);
+    .reposition(-1, 1, 0, 0, 47.3980210, 8.5462237, 4.0);
+    .wait(4000);
+    .land(0, 0, 0, 0, 47.3980210, 8.5462237, 0.0). */
+
+!demo_mission.
++!demo_mission <-
+    .print("Demo: upload a short mission and start AUTO mission.");
+    .mission_clear;
+    .wait(500);
+    .mission_item(47.3979710, 8.5461637, 4.0); //mission 0
+    .mission_item(47.3980210, 8.5461637, 4.0); //mission 1
+    .mission_item(47.3980210, 8.5462237, 4.0); //mission 2
+    .wait(500);
+    .arming(1);
+    .wait(500);
+    .mission_start(0, 2); //(first item (0), last item (2)) - if 2nd parameter is -1, it'll run until the last added item (treated on class-side).
+    .wait(20000);
+    .rtl.
+

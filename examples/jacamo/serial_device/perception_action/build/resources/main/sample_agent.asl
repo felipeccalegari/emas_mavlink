@@ -1,4 +1,4 @@
-!start.
+/* !start.
 
 +!start <-
     -awaiting_z(_);
@@ -27,4 +27,55 @@
             .print("Reposition Z counter finished.");
         };
     };
-    -step_transitioning(_).
+    -step_transitioning(_). */
+
+/* Visible MAVLink examples for PX4 SITL. */
+
+/* !demo_takeoff_land.
++!demo_takeoff_land <-
+    .print("Demo: arm -> takeoff -> land.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 3.0);
+    .wait(8000);
+    .land(0, 0, 0, 0, 47.3979710, 8.5461637, 0.0). */
+
+/* !demo_takeoff_rtl.
++!demo_takeoff_rtl <-
+    .print("Demo: arm -> takeoff -> RTL.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(8000);
+    .rtl. */
+
+/* !demo_square.
++!demo_square <-
+    .print("Demo: arm -> takeoff -> 3 reposition steps -> land.");
+    .arming(1);
+    .wait(500);
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(7000);
+    .reposition(-1, 1, 0, 0, 47.3979710, 8.5461637, 4.0);
+    .wait(4000);
+    .reposition(-1, 1, 0, 0, 47.3980210, 8.5461637, 4.0);
+    .wait(4000);
+    .reposition(-1, 1, 0, 0, 47.3980210, 8.5462237, 4.0);
+    .wait(4000);
+    .land(0, 0, 0, 0, 47.3980210, 8.5462237, 0.0). */
+
+!demo_mission.
++!demo_mission <-
+    .print("Demo: upload a short mission and start AUTO mission.");
+    .mission_clear;
+    .wait(500);
+    .mission_item(47.3979710, 8.5461637, 4.0);
+    .mission_item(47.3980210, 8.5461637, 4.0);
+    .mission_item(47.3980210, 8.5462237, 4.0);
+    .wait(500);
+    .arming(1);
+    .wait(500);
+    .mission_start(0, 2);
+    .wait(20000);
+    .rtl.
+

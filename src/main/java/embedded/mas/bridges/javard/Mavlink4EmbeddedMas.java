@@ -74,9 +74,9 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     private Thread mavRxThread;
     private Thread heartbeatThread;
     private BlockingQueue<Object> missionProtocolQueue;
-    private Map<String, String> latestTelemetry;
     private Map<String, Long> telemetryEmitMs;
     private Object telemetryLock;
+    private volatile String latestTelemetryJson;
 
     private static class MissionWp {
         final double latDeg;
@@ -101,6 +101,16 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
             "io.dronefleet.mavlink.uavionix"
     };
 
+    private static final Set<MavCmd> COMMAND_INT_CANDIDATES = new HashSet<>(Arrays.asList(
+            MavCmd.MAV_CMD_NAV_WAYPOINT,
+            MavCmd.MAV_CMD_NAV_LOITER_UNLIM,
+            MavCmd.MAV_CMD_NAV_LOITER_TURNS,
+            MavCmd.MAV_CMD_NAV_LOITER_TIME,
+            MavCmd.MAV_CMD_NAV_LAND,
+            MavCmd.MAV_CMD_NAV_TAKEOFF,
+            MavCmd.MAV_CMD_DO_REPOSITION
+    ));
+
     public Mavlink4EmbeddedMas(String portDescription, int baudRate)
             throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException {
         super(portDescription, baudRate);
@@ -114,6 +124,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     }
 
     @Override
+    // Sends either a MAVLink command or raw serial text, depending on the input.
     public boolean write(String s) {
         if (s == null || s.trim().isEmpty()) return false;
 
@@ -135,6 +146,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     }
 
     @Override
+    // Opens the base serial connection and then starts the MAVLink side if needed.
     public boolean openConnection() {
         boolean ok = super.openConnection();
         if (ok && constructorReady) {
@@ -144,6 +156,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     }
 
     @Override
+    // Stops background MAVLink threads before closing the serial connection.
     public void closeConnection() {
         heartbeatRunning = false;
         mavRxRunning = false;
@@ -156,6 +169,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     }
 
     @Override
+    // Returns the latest cached MAVLink telemetry converted to JSON beliefs.
     public String serialRead() {
         try {
             initMavlinkMode();
@@ -172,13 +186,13 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Initializes queues, RX/TX helpers, and background MAVLink threads once.
     private synchronized void initMavlinkMode() {
         if (mavlinkStarted) return;
 
         mavTxLock = new Object();
         telemetryLock = new Object();
         missionProtocolQueue = new LinkedBlockingQueue<>();
-        latestTelemetry = new ConcurrentHashMap<>();
         telemetryEmitMs = new ConcurrentHashMap<>();
         missionBuffer = new ArrayList<>();
 
@@ -189,6 +203,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         mavlinkStarted = true;
     }
 
+    // Prepares the MAVLink transmit connection that writes bytes to the serial port.
     private void ensureMavlinkTx() throws IOException {
         if (mavTxLock == null) {
             mavTxLock = new Object();
@@ -201,6 +216,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Serializes one MAVLink payload and pushes it to the external port.
     private void sendMavlink(Object payload) throws IOException {
         ensureMavlinkTx();
 
@@ -216,10 +232,12 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Detects whether the outgoing text looks like a MAVLink command expression.
     private boolean isMavlinkCommand(String text) {
         return text.matches("^[A-Z0-9_]+(?:\\s*\\(.*\\))?$");
     }
 
+    // Creates the MAVLink receive connection from the serial input stream.
     private void initMavlinkRx() {
         if (mavRxConn != null) return;
         try {
@@ -229,6 +247,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Starts the background reader that turns incoming MAVLink packets into beliefs.
     private void startMavlinkReader() {
         if (mavRxRunning) return;
         mavRxRunning = true;
@@ -288,6 +307,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         mavRxThread.start();
     }
 
+    // Starts a periodic GCS heartbeat so PX4 keeps the MAVLink link active.
     private void startGcsHeartbeat() {
         if (heartbeatRunning) return;
         heartbeatRunning = true;
@@ -313,6 +333,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         heartbeatThread.start();
     }
 
+    // Sends one immediate GCS heartbeat packet.
     private void sendGcsHeartbeatNow() throws IOException {
         Heartbeat hb = Heartbeat.builder()
                 .type(MavType.MAV_TYPE_GCS)
@@ -324,31 +345,17 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         sendMavlink(hb);
     }
 
+    // Returns the newest telemetry snapshot and clears the cache.
     private String readMavlinkTelemetryNonBlocking() {
-        synchronized (telemetryLock) {
-            if (latestTelemetry.isEmpty()) {
-                return "";
-            }
-
-            StringBuilder sb = new StringBuilder(512);
-            sb.append("{");
-
-            boolean first = true;
-            for (Map.Entry<String, String> entry : latestTelemetry.entrySet()) {
-                if (!first) {
-                    sb.append(",");
-                }
-                first = false;
-                sb.append("\"").append(entry.getKey()).append("\":").append(entry.getValue());
-            }
-
-            sb.append("}");
-            String snapshot = sb.toString();
-            latestTelemetry.clear();
-            return snapshot;
+        String snapshot = latestTelemetryJson;
+        if (snapshot == null || snapshot.isEmpty()) {
+            return "";
         }
+        latestTelemetryJson = null;
+        return snapshot;
     }
 
+    // Stores only the telemetry beliefs that this bridge currently exposes to Jason.
     private void cacheLatestTelemetry(String json) {
         int keyStart = json.indexOf('"');
         if (keyStart < 0) return;
@@ -360,8 +367,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         if (valueStart < 0) return;
 
         String key = json.substring(keyStart + 1, keyEnd);
-        String value = json.substring(valueStart + 1, json.length() - 1).trim();
-        if (key.isEmpty() || value.isEmpty()) return;
+        if (key.isEmpty()) return;
 
         if (!key.equals("localpositionned")) {
             return;
@@ -375,11 +381,10 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
         telemetryEmitMs.put(key, now);
 
-        synchronized (telemetryLock) {
-            latestTelemetry.put(key, value);
-        }
+        latestTelemetryJson = json;
     }
 
+    // Converts one MAVLink payload object into the compact JSON format used by the agent.
     private String mavPayloadToJson(Object payload) {
         try {
             Class<?> cls = payload.getClass();
@@ -421,6 +426,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Appends one Java value to the JSON builder, including enums and arrays.
     private void appendJsonValue(StringBuilder sb, Object v) {
         if (v == null) {
             sb.append("null");
@@ -501,6 +507,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         sb.append("\"").append(escapeJson(v.toString())).append("\"");
     }
 
+    // Escapes plain text so it can be placed safely into JSON.
     private String escapeJson(String s) {
         if (s == null) return "";
         StringBuilder out = new StringBuilder(s.length() + 8);
@@ -532,6 +539,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Parses NAME(...) commands into a command name plus raw string parameters.
     private ParsedCommand parseCommand(String text) throws Exception {
         text = text.trim();
         Pattern pattern = Pattern.compile("^([A-Z0-9_]+)\\s*\\(([^)]*)\\)\\s*$");
@@ -552,19 +560,50 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         return new ParsedCommand(name, params);
     }
 
+    // Parses an integer parameter, defaulting to zero on invalid input.
     private int toInt(String s) {
         try { return Integer.parseInt(s.trim()); } catch (Exception e) { return 0; }
     }
 
+    // Parses a float parameter, defaulting to zero on invalid input.
     private float toFloat(String s) {
         try { return Float.parseFloat(s.trim()); } catch (Exception e) { return 0f; }
     }
 
-    private boolean shouldUseCommandInt(String name) {
-        return name.equals("MAV_CMD_NAV_WAYPOINT")
-                || name.equals("MAV_CMD_DO_REPOSITION");
+    // Checks whether the command parameters include a non-zero location.
+    private boolean hasLocationParams(String[] params) {
+        if (params.length < 7) return false;
+        return !isZeroish(params[4]) || !isZeroish(params[5]) || !isZeroish(params[6]);
     }
 
+    // Treats invalid or near-zero numeric text as zero for routing decisions.
+    private boolean isZeroish(String raw) {
+        try {
+            return Math.abs(Double.parseDouble(raw.trim())) < 1e-9;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    // Chooses COMMAND_INT only for commands that benefit from location-aware encoding.
+    private boolean shouldUseCommandInt(MavCmd command, String[] params) {
+        return COMMAND_INT_CANDIDATES.contains(command) && hasLocationParams(params);
+    }
+
+    // Resolves a MAV_CMD name and fails with a clearer error if the enum is missing it.
+    private MavCmd resolveMavCmd(String name) throws Exception {
+        String normalized = name.trim();
+        if (!normalized.startsWith("MAV_CMD_")) {
+            normalized = "MAV_CMD_" + normalized;
+        }
+        try {
+            return MavCmd.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            throw new Exception("Unsupported MAV_CMD in DroneFleet enum: " + normalized, e);
+        }
+    }
+
+    // Sends a MAV_CMD through COMMAND_LONG, filling missing params with zero.
     private void sendCommandLong(MavCmd command, String[] params) throws IOException {
         float[] p = new float[7];
         for (int i = 0; i < 7; i++) p[i] = (i < params.length) ? toFloat(params[i]) : 0f;
@@ -587,6 +626,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         sendMavlink(msg);
     }
 
+    // Sends a MAV_CMD through COMMAND_INT using global-relative lat/lon/alt.
     private void sendCommandInt(MavCmd command, String[] params) throws IOException {
         float[] p = new float[7];
         for (int i = 0; i < 7; i++) p[i] = (i < params.length) ? toFloat(params[i]) : 0f;
@@ -610,6 +650,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         sendMavlink(msg);
     }
 
+    // Buffers one mission waypoint so the full mission can be uploaded later.
     private void handleBufferedMissionItemInt(String[] params) throws Exception {
         if (params.length < 3) {
             throw new Exception("MISSION_ITEM_INT expects at least 3 params: latDeg, lonDeg, altM");
@@ -633,6 +674,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Uploads the buffered mission and starts it from the requested item range.
     private void startMissionUpload(int firstItem, int lastItem) throws IOException {
         final List<MissionWp> missionSnapshot;
         synchronized (missionBuffer) {
@@ -716,12 +758,14 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Clears the local mission buffer used before upload.
     private void clearMissionBuffer() {
         synchronized (missionBuffer) {
             missionBuffer.clear();
         }
     }
 
+    // Builds one MISSION_ITEM_INT from a buffered waypoint.
     private MissionItemInt buildMissionItem(MissionWp wp, int seq) {
         int latE7 = (int) Math.round(wp.latDeg * 1e7);
         int lonE7 = (int) Math.round(wp.lonDeg * 1e7);
@@ -749,6 +793,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                 .build();
     }
 
+    // Waits for PX4 to request the next mission item during upload.
     private int waitForMissionRequest(long timeoutMs, int missionSize) throws IOException {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
@@ -778,6 +823,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         throw new IOException("Timed out waiting for MISSION_REQUEST(_INT).");
     }
 
+    // Waits for the final mission ACK after all mission items are sent.
     private void waitForMissionAck(long timeoutMs) throws IOException {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
@@ -797,6 +843,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         throw new IOException("Timed out waiting for MISSION_ACK.");
     }
 
+    // Sends all mission items without waiting for per-item requests as a fallback path.
     private void sendMissionItemsBulk(List<MissionWp> missionSnapshot) throws IOException {
         for (int seq = 0; seq < missionSnapshot.size(); seq++) {
             MissionWp wp = missionSnapshot.get(seq);
@@ -806,10 +853,12 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
     }
 
+    // Sleeps without propagating interruption errors into the control flow.
     private void sleepQuiet(long ms) {
         try { Thread.sleep(ms); } catch (InterruptedException ignored) {}
     }
 
+    // Finds a generated MAVLink payload class by checking the known dialect packages.
     private Class<?> resolvePayloadClass(String msgName) {
         String className = toClassName(msgName);
         for (String pkg : DIALECT_PACKAGES) {
@@ -820,6 +869,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         return null;
     }
 
+    // Converts MAVLink snake case names to the Java class name expected by DroneFleet.
     private String toClassName(String msgName) {
         String lower = msgName.toLowerCase(Locale.ROOT);
         String[] parts = lower.split("_");
@@ -832,6 +882,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         return sb.toString();
     }
 
+    // Builds non-command MAVLink payloads generically by reflecting over builder fields.
     private Object buildGenericPayload(String msgName, String[] params) throws Exception {
         Class<?> payloadClass = resolvePayloadClass(msgName);
         if (payloadClass == null) throw new Exception("Unknown MAVLink message: " + msgName);
@@ -876,6 +927,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         return build.invoke(builder);
     }
 
+    // Converts one raw string argument into the builder field type expected by DroneFleet.
     private Object convertArg(String raw, Class<?> t) throws Exception {
         if (t == String.class) return raw;
         if (t == int.class || t == Integer.class) return Integer.parseInt(raw);
@@ -923,6 +975,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         throw new Exception("Unsupported builder argument type: " + t.getName() + " for value " + raw);
     }
 
+    // Dispatches parsed MAVLink commands to the specific send/upload helper (most used commands).
     private void processMavlinkCommand(String text) throws Exception {
         ParsedCommand cmd = parseCommand(text);
         String name = cmd.name;
@@ -990,8 +1043,8 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
 
         if (name.startsWith("MAV_CMD_")) {
-            MavCmd command = MavCmd.valueOf(name);
-            if (shouldUseCommandInt(name)) sendCommandInt(command, params);
+            MavCmd command = resolveMavCmd(name);
+            if (shouldUseCommandInt(command, params)) sendCommandInt(command, params);
             else sendCommandLong(command, params);
             return;
         }

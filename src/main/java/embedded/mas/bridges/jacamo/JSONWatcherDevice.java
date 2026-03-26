@@ -6,7 +6,6 @@ package embedded.mas.bridges.jacamo;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
 import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,26 +22,31 @@ import jason.asSyntax.Literal;
 
 public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	
-	List<Collection<Literal>> listOfBeliefs = Collections.synchronizedList(new ArrayList<Collection<Literal>>());
+	// Changed from the original synchronized list to a single latest snapshot.
+	// This avoids queue growth and fits the "use the newest telemetry" behavior.
+	private volatile Collection<Literal> latestBeliefs = Collections.emptyList();
 	
 	public JSONWatcherDevice(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);	
-		MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(listOfBeliefs,this.getMicrocontroller());
+		// Changed to use the new direct-update constructor instead of sharing a belief list.
+		MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(this, this.getMicrocontroller());
 		microcontrollerMonitor.start();
 	}
 	
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException{
-		
-		Collection<Literal> percepts = new ArrayList<Literal>();
-		
-		if(listOfBeliefs.size()>0) {
-			 percepts = listOfBeliefs.get(listOfBeliefs.size()-1);
-			synchronized (listOfBeliefs) {
-				listOfBeliefs.clear();
-			}
-		}
+		// Changed from "take last item and clear the whole list" to a simple atomic snapshot read.
+		Collection<Literal> percepts = latestBeliefs;
+		latestBeliefs = Collections.emptyList();
 		return percepts;
+	}
+
+	// New helper used by MicrocontrollerMonitor to publish the newest parsed beliefs directly.
+	public void updateLatestBeliefs(Collection<Literal> percepts) {
+		if (percepts == null || percepts.isEmpty()) {
+			return;
+		}
+		latestBeliefs = percepts;
 	}
 
 	@Override
