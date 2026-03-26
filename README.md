@@ -1,30 +1,39 @@
 # emas_mavlink
-Customized NRJ4EmbeddedMas and SerialDevice classes from Embedded-Mas framework to work with MAVLink protocol using DroneFleet 1.11.1 library.
+Customized classes from Embedded-Mas framework to work with MAVLink protocol using DroneFleet 1.1.11 library.
 
 ### Environment:
 - Ubuntu 24.04 machine running PX4 v1.17 with Gazebo
 - Raspberry Pi 5 (Jason Agents) <-Serial-> Raspberry Pi 4 (Send/Receive messages) <-UDP-> Ubuntu/PX4 Simulation
 - Simulation startup scripts were adapted to connect with Raspberry Pi 4 IP and then started with: `MAV_BROADCAST=1 make px4_sitl gz_x500`
 
-### Adapted Classes:
-- embedded-mas/src/main/java/embedded/mas/bridges/javard/NRJ4EmbeddedMas.java
-- embedded-mas/src/main/java/embedded/mas/bridges/jacamo/SerialDevice.java
+- Users can run via a "virtual serial" with *Socat* tool (`sudo apt install socat`) with the following commands:
+`socat -d -d \
+  pty,raw,echo=0,link=/dev/ttyV1,wait-slave \
+  udp:127.0.0.1:14560,sourceport=14561`
+
+`make px4_sitl gz_x500`
+*After PX4 loads and the 'Ready for Takeoff' messages shows up, run in PX4's terminal:*
+`mavlink start -u 14560 -o 14561 -t 127.0.0.1 -m onboard -r 40000`
 
 ### Agent side:
-**Example**: embedded-mas/examples/jacamo/serial_device/perception_action/sample_agent.asl
+**Examples**: ./examples/jacamo/serial_device/perception_action/src/agt
+- Running the agent:
+`cd examples/jacamo/serial_device/perception_action/`
+`./gradlew run`
 
 - Agent can:
   - Arm.
   - Set modes (Tested: AUTO.TAKEOFF and AUTO.MISSION).
   - Add waypoints to missions (Mission mode).
   - Start mission.
-  - Works with most commands that uses _MAV_CMD_*_ dialects from MAVLink _common.xml_.
+  - Works with many commands that uses _MAV_CMD_*_ dialects from MAVLink _common.xml_ as long as they're present in the MavCmd enum from DroneFleet.
 
 - Agent can't:
-  - Receive messages from serial/PX4 (yet) - perceptions.
-  - Set mode with OFFBOARD option.
+  - Set mode with OFFBOARD option - agent succesfully changes to Offboard mode in PX4 but drone wont takeoff/go to specific coordinates with that mode.
   - Commands from MAVLink dialect that don't start with "MAV_CMD_*" need to be tested.
 
-- After PX4 v1.15, they stopped using MAV_CMD_DO_SET_MODE to be replaced by STANDARD, but can't be found on _common.xml_ dialects, therefore, i'm using SET_MODE (which is deprecated) to work properly with different modes.
+- For this project, mode changes are currently handled via *SET_MODE* for compatibility with tested PX4 modes
 
-- Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters, which by default uses its own standards but the NRJ class will automatically multiply the Lat and Lon coordinates by multiplier so Agent Programmer only needs to insert normal degrees (eg. 45.273333) instead of a large number. Also NRJ class automatically converts the "Missions" into _Waypoint_ MAVLink command.
+- Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters, which by default uses its own standards but the Mavlink4EmbeddedMas class will automatically multiply the Lat and Lon coordinates by multiplier so Agent Programmer only needs to insert normal degrees (eg. 45.273333) instead of a large number. Also the code uploads mission items as *MISSION_ITEM_INT*, where a *Takeoff* is the first item, and the rest are considered _Waypoints_.
+
+- Adding new agent actions: in the sample_agent.yaml, user can add "*actionName*", which will be the action used in the .asl file and the respective Mavlink code in "*actuationName*".

@@ -69,13 +69,103 @@
     .print("Demo: upload a short mission and start AUTO mission.");
     .mission_clear;
     .wait(500);
-    .mission_item(47.3979710, 8.5461637, 4.0);
-    .mission_item(47.3980210, 8.5461637, 4.0);
-    .mission_item(47.3980210, 8.5462237, 4.0);
+    .mission_item(47.3979710, 8.5461637, 4.0); //mission 0
+    .mission_item(47.3980210, 8.5461637, 4.0); //mission 1
+    .mission_item(47.3980210, 8.5462237, 4.0); //mission 2
     .wait(500);
     .arming(1);
     .wait(500);
-    .mission_start(0, 2);
+    .mission_start(0, 2); //(first item (0), last item (2)) - if 2nd parameter is -1, it'll run until the last added item (treated on class-side).
     .wait(20000);
     .rtl.
 
+/* Common MAVLink perception examples.*/
+
+/* Uncomment these first if you just want to confirm messages are arriving.
+
++heartbeat(A,B,C,D,E,F)
+  <-
+    .print("heartbeat=", A, ";", B, ";", C, ";", D, ";", E, ";", F).
+
++attitude(A,B,C,D,E,F,G)
+  <-
+    .print("attitude=", A, ";", B, ";", C, ";", D, ";", E, ";", F, ";", G).
+
++sysstatus(A,B,C,D,E,F,G,H,I,J,K,L,M)
+  <-
+    .print("sysstatus=", A, ";", B, ";", C, ";", D, ";", E, ";", F, ";", G, ";", H,
+           ";", I, ";", J, ";", K, ";", L, ";", M).
+
++statustext(A,B,C,D)
+  <-
+    .print("statustext=", A, ";", B, ";", C, ";", D).
+*/
+
+hb_gap_ns(5000000000).
+lp_gap_ns(7000000000).
+att_gap_ns(7000000000).
+sys_gap_ns(3000000000).
+gps_gap_ns(7000000000).
+
+last_hb_ns(0).
+last_lp_ns(0).
+last_att_ns(0).
+last_sys_ns(0).
+last_gps_ns(0).
+
++heartbeat(A,B,C,D,E,F)
+  : last_hb_ns(Last) & hb_gap_ns(Gap)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_hb_ns(_);
+      +last_hb_ns(Now);
+      .print("1. Heartbeat: type=", A, ", autopilot=", B, ", base_mode=", C, ", custom_mode=", D,
+             ", system_status=", E, ", mavlink_version=", F)
+    }.
+
++localpositionned(X,Y,Zned,Vx,Vy,Vz)
+  : last_lp_ns(Last) & lp_gap_ns(Gap)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_lp_ns(_);
+      +last_lp_ns(Now);
+      Alt = -Zned;
+      .print("Local position NED: x=", X, ", y=", Y, ", alt=", Alt,
+             ", vx=", Vx, ", vy=", Vy, ", vz=", Vz)
+    }.
+
++attitude(Roll,Pitch,Yaw,_,_,_,_)
+  : last_att_ns(Last) & att_gap_ns(Gap)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_att_ns(_);
+      +last_att_ns(Now);
+      .print("Attitude: roll=", Roll, ", pitch=", Pitch, ", yaw=", Yaw)
+    }.
+
++sysstatus(_,_,_,_,_,_,_,BatteryRemaining,_,_,_,_,_)
+  : last_sys_ns(Last) & sys_gap_ns(Gap)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_sys_ns(_);
+      +last_sys_ns(Now);
+      .print("Battery remaining: ", BatteryRemaining)
+    }.
+
++statustext(Severity,Text,_,_)
+  <-
+    .print("PX4 status [", Severity, "]: ", Text).
+
++globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
+  : last_gps_ns(Last) & gps_gap_ns(Gap)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_gps_ns(_);
+      +last_gps_ns(Now);
+      .print("[GPS] lat=",Lat," lon=",Lon," alt=",Alt," relAlt=",RelAlt)
+    }.

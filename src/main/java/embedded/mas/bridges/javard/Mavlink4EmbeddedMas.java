@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -75,8 +76,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     private Thread heartbeatThread;
     private BlockingQueue<Object> missionProtocolQueue;
     private Map<String, Long> telemetryEmitMs;
-    private Object telemetryLock;
-    private volatile String latestTelemetryJson;
+    private Map<String, String> latestTelemetryJsonByKey;
 
     private static class MissionWp {
         final double latDeg;
@@ -191,9 +191,9 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         if (mavlinkStarted) return;
 
         mavTxLock = new Object();
-        telemetryLock = new Object();
         missionProtocolQueue = new LinkedBlockingQueue<>();
         telemetryEmitMs = new ConcurrentHashMap<>();
+        latestTelemetryJsonByKey = new LinkedHashMap<>();
         missionBuffer = new ArrayList<>();
 
         try { ensureMavlinkTx(); } catch (Exception ignored) {}
@@ -347,15 +347,28 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
 
     // Returns the newest telemetry snapshot and clears the cache.
     private String readMavlinkTelemetryNonBlocking() {
-        String snapshot = latestTelemetryJson;
-        if (snapshot == null || snapshot.isEmpty()) {
-            return "";
+        synchronized (latestTelemetryJsonByKey) {
+            if (latestTelemetryJsonByKey.isEmpty()) {
+                return "";
+            }
+
+            StringBuilder sb = new StringBuilder(512);
+            sb.append("{");
+            boolean first = true;
+            for (Map.Entry<String, String> entry : latestTelemetryJsonByKey.entrySet()) {
+                if (!first) {
+                    sb.append(",");
+                }
+                first = false;
+                sb.append("\"").append(escapeJson(entry.getKey())).append("\":").append(entry.getValue());
+            }
+            sb.append("}");
+            latestTelemetryJsonByKey.clear();
+            return sb.toString();
         }
-        latestTelemetryJson = null;
-        return snapshot;
     }
 
-    // Stores only the telemetry beliefs that this bridge currently exposes to Jason.
+    // Stores the latest payload per MAVLink message type so multiple beliefs can be read together.
     private void cacheLatestTelemetry(String json) {
         int keyStart = json.indexOf('"');
         if (keyStart < 0) return;
@@ -369,10 +382,6 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         String key = json.substring(keyStart + 1, keyEnd);
         if (key.isEmpty()) return;
 
-        if (!key.equals("localpositionned")) {
-            return;
-        }
-
         long now = System.currentTimeMillis();
         Long last = telemetryEmitMs.get(key);
         long minGapMs = 100L;
@@ -381,7 +390,10 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         }
         telemetryEmitMs.put(key, now);
 
-        latestTelemetryJson = json;
+        String valueJson = json.substring(valueStart + 1, json.length() - 1).trim();
+        synchronized (latestTelemetryJsonByKey) {
+            latestTelemetryJsonByKey.put(key, valueJson);
+        }
     }
 
     // Converts one MAVLink payload object into the compact JSON format used by the agent.

@@ -1,0 +1,54 @@
+[sample_agent] Demo: upload a short mission and start AUTO mission.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Armed by external command\t
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Executing Mission\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Takeoff detected\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Mission finished, loitering\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Returning to launch\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: RTL: land at destination\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Landing detected\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Disarmed by landing\t
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.
+[sample_agent] Perceived heartbeat.

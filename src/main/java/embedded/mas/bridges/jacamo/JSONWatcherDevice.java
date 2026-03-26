@@ -5,15 +5,10 @@
 package embedded.mas.bridges.jacamo;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
@@ -22,9 +17,8 @@ import jason.asSyntax.Literal;
 
 public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	
-	// Changed from the original synchronized list to a single latest snapshot.
-	// This avoids queue growth and fits the "use the newest telemetry" behavior.
-	private volatile Collection<Literal> latestBeliefs = Collections.emptyList();
+	// Keep only the latest value for each belief functor so multiple MAVLink perceptions can coexist.
+	private final Map<String, Literal> latestBeliefs = Collections.synchronizedMap(new LinkedHashMap<String, Literal>());
 	
 	public JSONWatcherDevice(Atom id, IPhysicalInterface microcontroller) {
 		super(id, microcontroller);	
@@ -35,10 +29,12 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException{
-		// Changed from "take last item and clear the whole list" to a simple atomic snapshot read.
-		Collection<Literal> percepts = latestBeliefs;
-		latestBeliefs = Collections.emptyList();
-		return percepts;
+		// Return the latest belief of each type, then clear the snapshot for the next cycle.
+		synchronized (latestBeliefs) {
+			Collection<Literal> percepts = new java.util.ArrayList<Literal>(latestBeliefs.values());
+			latestBeliefs.clear();
+			return percepts;
+		}
 	}
 
 	// New helper used by MicrocontrollerMonitor to publish the newest parsed beliefs directly.
@@ -46,7 +42,13 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 		if (percepts == null || percepts.isEmpty()) {
 			return;
 		}
-		latestBeliefs = percepts;
+		synchronized (latestBeliefs) {
+			for (Literal percept : percepts) {
+				if (percept != null) {
+					latestBeliefs.put(percept.getFunctor(), percept);
+				}
+			}
+		}
 	}
 
 	@Override

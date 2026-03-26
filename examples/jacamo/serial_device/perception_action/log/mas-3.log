@@ -1,0 +1,150 @@
+[sample_agent] Demo: upload a short mission and start AUTO mission.
+[sample_agent] [GPS] lat=473979712 lon=85461636 alt=256 relAlt=151
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=256 relAlt=151
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=256 relAlt=151
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=255 relAlt=150
+[sample_agent] [GPS] lat=473979712 lon=85461634 alt=253 relAlt=148
+[sample_agent] [GPS] lat=473979712 lon=85461634 alt=251 relAlt=146
+[sample_agent] [GPS] lat=473979711 lon=85461634 alt=249 relAlt=144
+[sample_agent] [GPS] lat=473979711 lon=85461634 alt=249 relAlt=144
+[sample_agent] PX4 status [MAV_SEVERITY_EMERGENCY]: Accel #0 fail:  TIMEOUT!\t
+[sample_agent] [GPS] lat=473979711 lon=85461634 alt=271 relAlt=166
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Armed by external command\t
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979711 lon=85461635 alt=310 relAlt=25
+[sample_agent] [GPS] lat=473979711 lon=85461635 alt=322 relAlt=37
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=354 relAlt=69
+[sample_agent] [GPS] lat=473979712 lon=85461634 alt=477 relAlt=192
+[sample_agent] PX4 status [MAV_SEVERITY_CRITICAL]: Mission start denied! No valid mission\t
+[sample_agent] [GPS] lat=473979712 lon=85461634 alt=497 relAlt=212
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Takeoff detected\t
+[sample_agent] [GPS] lat=473979713 lon=85461634 alt=566 relAlt=64
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979713 lon=85461634 alt=671 relAlt=168
+[sample_agent] [GPS] lat=473979713 lon=85461634 alt=747 relAlt=245
+[sample_agent] [GPS] lat=473979714 lon=85461633 alt=880 relAlt=377
+[sample_agent] [GPS] lat=473979714 lon=85461633 alt=905 relAlt=402
+[sample_agent] [GPS] lat=473979714 lon=85461633 alt=918 relAlt=415
+[sample_agent] [GPS] lat=473979714 lon=85461633 alt=945 relAlt=442
+[sample_agent] [GPS] lat=473979714 lon=85461634 alt=979 relAlt=476
+[sample_agent] [GPS] lat=473979714 lon=85461634 alt=974 relAlt=471
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979713 lon=85461634 alt=1011 relAlt=508
+[sample_agent] [GPS] lat=473979713 lon=85461636 alt=1071 relAlt=568
+[sample_agent] [GPS] lat=473979712 lon=85461638 alt=1110 relAlt=607
+[sample_agent] [GPS] lat=473979712 lon=85461639 alt=1121 relAlt=618
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979711 lon=85461639 alt=1120 relAlt=618
+[sample_agent] [GPS] lat=473979710 lon=85461639 alt=1109 relAlt=607
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=1086 relAlt=583
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Landing detected\t
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=1075 relAlt=572
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=1041 relAlt=538
+[sample_agent] [GPS] lat=473979709 lon=85461638 alt=1002 relAlt=499
+[sample_agent] [GPS] lat=473979708 lon=85461638 alt=967 relAlt=464
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979708 lon=85461638 alt=953 relAlt=450
+[sample_agent] [GPS] lat=473979708 lon=85461638 alt=931 relAlt=428
+[sample_agent] [GPS] lat=473979708 lon=85461637 alt=897 relAlt=395
+[sample_agent] [GPS] lat=473979708 lon=85461636 alt=873 relAlt=370
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Disarmed by landing\t
+[sample_agent] [GPS] lat=473979709 lon=85461635 alt=845 relAlt=342
+[sample_agent] [GPS] lat=473979709 lon=85461635 alt=840 relAlt=337
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979709 lon=85461635 alt=805 relAlt=302
+[sample_agent] [GPS] lat=473979709 lon=85461635 alt=788 relAlt=286
+[sample_agent] [GPS] lat=473979709 lon=85461635 alt=784 relAlt=281
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=767 relAlt=265
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=760 relAlt=257
+[sample_agent] [GPS] lat=473979711 lon=85461637 alt=732 relAlt=229
+[sample_agent] [GPS] lat=473979711 lon=85461637 alt=700 relAlt=197
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=673 relAlt=170
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=657 relAlt=154
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461639 alt=640 relAlt=137
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=612 relAlt=109
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=573 relAlt=70
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=551 relAlt=48
+[sample_agent] [GPS] lat=473979709 lon=85461639 alt=531 relAlt=28
+[sample_agent] [GPS] lat=473979708 lon=85461639 alt=495 relAlt=-6
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=461 relAlt=-41
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=451 relAlt=-51
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=431 relAlt=-71
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=396 relAlt=-106
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=374 relAlt=-128
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=366 relAlt=-136
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=353 relAlt=-149
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=333 relAlt=-169
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=310 relAlt=-191
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=296 relAlt=-206
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=284 relAlt=-218
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=280 relAlt=-222
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=260 relAlt=-242
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=251 relAlt=-251
+[sample_agent] [GPS] lat=473979707 lon=85461640 alt=245 relAlt=-257
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979707 lon=85461639 alt=236 relAlt=-266
+[sample_agent] [GPS] lat=473979707 lon=85461638 alt=271 relAlt=-231
+[sample_agent] [GPS] lat=473979708 lon=85461637 alt=292 relAlt=-210
+[sample_agent] [GPS] lat=473979708 lon=85461637 alt=299 relAlt=-203
+[sample_agent] [GPS] lat=473979708 lon=85461637 alt=312 relAlt=-190
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979708 lon=85461636 alt=327 relAlt=-175
+[sample_agent] [GPS] lat=473979708 lon=85461635 alt=335 relAlt=-167
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979708 lon=85461635 alt=338 relAlt=-163
+[sample_agent] [GPS] lat=473979709 lon=85461636 alt=344 relAlt=-158
+[sample_agent] [GPS] lat=473979709 lon=85461636 alt=347 relAlt=-155
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=391 relAlt=-111
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979711 lon=85461636 alt=417 relAlt=-85
+[sample_agent] [GPS] lat=473979711 lon=85461636 alt=435 relAlt=-66
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=445 relAlt=-57
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=452 relAlt=-50
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=450 relAlt=-52
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=444 relAlt=-58
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979712 lon=85461635 alt=437 relAlt=-65
+[sample_agent] [GPS] lat=473979711 lon=85461635 alt=418 relAlt=-84
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=384 relAlt=-117
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=366 relAlt=-136
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461637 alt=355 relAlt=-147
+[sample_agent] [GPS] lat=473979710 lon=85461637 alt=350 relAlt=-152
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Returning to launch\t
+[sample_agent] [GPS] lat=473979710 lon=85461637 alt=332 relAlt=-170
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=331 relAlt=-171
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
+[sample_agent] [GPS] lat=473979711 lon=85461638 alt=349 relAlt=-153
+[sample_agent] [GPS] lat=473979711 lon=85461638 alt=364 relAlt=-137
+[sample_agent] [GPS] lat=473979711 lon=85461638 alt=370 relAlt=-131
+[sample_agent] [GPS] lat=473979711 lon=85461638 alt=374 relAlt=-128
+[sample_agent] [GPS] lat=473979711 lon=85461637 alt=377 relAlt=-125
+[sample_agent] [GPS] lat=473979712 lon=85461636 alt=376 relAlt=-126
+[sample_agent] [GPS] lat=473979712 lon=85461636 alt=375 relAlt=-127
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
+[sample_agent] [GPS] lat=473979711 lon=85461636 alt=369 relAlt=-133
+[sample_agent] [GPS] lat=473979711 lon=85461636 alt=362 relAlt=-140
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461635 alt=368 relAlt=-134
+[sample_agent] [GPS] lat=473979710 lon=85461635 alt=365 relAlt=-137
+[sample_agent] [GPS] lat=473979710 lon=85461635 alt=361 relAlt=-140
+[sample_agent] [GPS] lat=473979710 lon=85461635 alt=352 relAlt=-150
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=324 relAlt=-178
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461636 alt=316 relAlt=-186
+[sample_agent] [GPS] lat=473979710 lon=85461637 alt=294 relAlt=-207
+[sample_agent] [GPS] lat=473979710 lon=85461637 alt=274 relAlt=-228
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=255 relAlt=-247
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=238 relAlt=-263
+[sample_agent] [GPS] lat=473979710 lon=85461639 alt=227 relAlt=-275
+[sample_agent] [GPS] lat=473979711 lon=85461640 alt=200 relAlt=-302
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=84148224, system_status=MAV_STATE_UNINIT, mavlink_version=3
