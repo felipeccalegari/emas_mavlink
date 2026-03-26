@@ -37,3 +37,15 @@ Customized classes from Embedded-Mas framework to work with MAVLink protocol usi
 - Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters, which by default uses its own standards but the Mavlink4EmbeddedMas class will automatically multiply the Lat and Lon coordinates by multiplier so Agent Programmer only needs to insert normal degrees (eg. 45.273333) instead of a large number. Also the code uploads mission items as *MISSION_ITEM_INT*, where a *Takeoff* is the first item, and the rest are considered _Waypoints_.
 
 - Adding new agent actions: in the sample_agent.yaml, user can add "*actionName*", which will be the action used in the .asl file and the respective Mavlink code in "*actuationName*".
+
+### Perceptions summary:
+Incoming MAVLink telemetry is also converted automatically into Jason perceptions. The perception name is derived from the MAVLink message type by removing `_`, joining the words, and converting the result to lowercase. For example, `GLOBAL_POSITION_INT` becomes `globalpositionint(...)` and `LOCAL_POSITION_NED` becomes `localpositionned(...)`. To discover the exact argument order for a perception, the easiest approach is to temporarily add a debug plan in the `.asl` file with variables for all arguments, print them, and then refine the final perception handler with only the fields you need.
+
+| MAVLink message | Jason perception |
+| --- | --- |
+| `HEARTBEAT` | `heartbeat(...)` |
+| `GLOBAL_POSITION_INT` | `globalpositionint(...)` |
+| `LOCAL_POSITION_NED` | `localpositionned(...)` |
+| `ATTITUDE` | `attitude(...)` |
+| `SYS_STATUS` | `sysstatus(...)` |
+| `STATUSTEXT` | `statustext(...)` |
