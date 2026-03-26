@@ -7,18 +7,19 @@ Customized classes from Embedded-Mas framework to work with MAVLink protocol usi
 - Simulation startup scripts were adapted to connect with Raspberry Pi 4 IP and then started with: `MAV_BROADCAST=1 make px4_sitl gz_x500`
 
 - Users can run via a "virtual serial" with *Socat* tool (`sudo apt install socat`) with the following commands:
-`socat -d -d \
-  pty,raw,echo=0,link=/dev/ttyV1,wait-slave \
-  udp:127.0.0.1:14560,sourceport=14561`
+`socat -d -d pty,raw,echo=0,link=/dev/ttyV1,wait-slave udp:127.0.0.1:14560,sourceport=14561`
 
 `make px4_sitl gz_x500`
+
 *After PX4 loads and the 'Ready for Takeoff' messages shows up, run in PX4's terminal:*
 `mavlink start -u 14560 -o 14561 -t 127.0.0.1 -m onboard -r 40000`
 
 ### Agent side:
 **Examples**: ./examples/jacamo/serial_device/perception_action/src/agt
 - Running the agent:
+
 `cd examples/jacamo/serial_device/perception_action/`
+
 `./gradlew run`
 
 - Agent can:
