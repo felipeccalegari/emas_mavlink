@@ -36,6 +36,7 @@ import io.dronefleet.mavlink.common.CommandLong;
 import io.dronefleet.mavlink.common.MavCmd;
 import io.dronefleet.mavlink.common.MavFrame;
 import io.dronefleet.mavlink.common.MavMode;
+import io.dronefleet.mavlink.common.MavParamType;
 import io.dronefleet.mavlink.common.MavMissionResult;
 import io.dronefleet.mavlink.common.MavMissionType;
 import io.dronefleet.mavlink.common.MissionAck;
@@ -45,6 +46,8 @@ import io.dronefleet.mavlink.common.MissionItemInt;
 import io.dronefleet.mavlink.common.MissionRequest;
 import io.dronefleet.mavlink.common.MissionRequestInt;
 import io.dronefleet.mavlink.common.MissionSetCurrent;
+import io.dronefleet.mavlink.common.ParamRequestRead;
+import io.dronefleet.mavlink.common.ParamSet;
 import io.dronefleet.mavlink.common.SetPositionTargetLocalNed;
 import io.dronefleet.mavlink.common.Timesync;
 import io.dronefleet.mavlink.minimal.MavAutopilot;
@@ -383,12 +386,15 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         if (key.isEmpty()) return;
 
         long now = System.currentTimeMillis();
-        Long last = telemetryEmitMs.get(key);
-        long minGapMs = 100L;
-        if (last != null && (now - last) < minGapMs) {
-            return;
+        boolean throttleEnabled = !"paramvalue".equals(key);
+        if (throttleEnabled) {
+            Long last = telemetryEmitMs.get(key);
+            long minGapMs = 100L;
+            if (last != null && (now - last) < minGapMs) {
+                return;
+            }
+            telemetryEmitMs.put(key, now);
         }
-        telemetryEmitMs.put(key, now);
 
         String valueJson = json.substring(valueStart + 1, json.length() - 1).trim();
         synchronized (latestTelemetryJsonByKey) {
@@ -1051,6 +1057,44 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
 
         if ("MISSION_CLEAR_ALL".equals(name)) {
             clearMissionBuffer();
+            return;
+        }
+
+        if ("PARAM_REQUEST_READ".equals(name)) {
+            if (params.length < 4) {
+                throw new Exception("PARAM_REQUEST_READ requires (targetSystem, targetComponent, paramId, paramIndex)");
+            }
+
+            ParamRequestRead msg = ParamRequestRead.builder()
+                    .targetSystem(toInt(params[0]))
+                    .targetComponent(toInt(params[1]))
+                    .paramId(params[2])
+                    .paramIndex(toInt(params[3]))
+                    .build();
+            sendMavlink(msg);
+            return;
+        }
+
+        if ("PARAM_SET".equals(name)) {
+            if (params.length < 5) {
+                throw new Exception("PARAM_SET requires (targetSystem, targetComponent, paramId, paramValue, paramType)");
+            }
+
+            EnumValue<MavParamType> paramType;
+            try {
+                paramType = EnumValue.of(MavParamType.valueOf(params[4]));
+            } catch (IllegalArgumentException ex) {
+                paramType = EnumValue.create(MavParamType.class, toInt(params[4]));
+            }
+
+            ParamSet msg = ParamSet.builder()
+                    .targetSystem(toInt(params[0]))
+                    .targetComponent(toInt(params[1]))
+                    .paramId(params[2])
+                    .paramValue(toFloat(params[3]))
+                    .paramType(paramType)
+                    .build();
+            sendMavlink(msg);
             return;
         }
 

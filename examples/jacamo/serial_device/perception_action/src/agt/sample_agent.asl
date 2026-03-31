@@ -64,7 +64,7 @@
     .wait(4000);
     .land(0, 0, 0, 0, 47.3980210, 8.5462237, 0.0). */
 
-!demo_mission.
+/* !demo_mission.
 +!demo_mission <-
     .print("Demo: upload a short mission and start AUTO mission.");
     .mission_clear;
@@ -77,12 +77,12 @@
     .wait(500);
     .mission_start(0, 2); //(first item (0), last item (2)) - if 2nd parameter is -1, it'll run until the last added item (treated on class-side).
     .wait(20000);
-    .rtl.
+    .rtl. */
 
 /* Common MAVLink perception examples.*/
 
 // Used nanoseconds to avoid perceptions spamming in the terminal and affect simulation behavior.
-hb_gap_ns(5000000000).
+/* hb_gap_ns(5000000000).
 lp_gap_ns(7000000000).
 att_gap_ns(7000000000).
 sys_gap_ns(3000000000).
@@ -149,4 +149,86 @@ last_gps_ns(0).
       -last_gps_ns(_);
       +last_gps_ns(Now);
       .print("[GPS] lat=",Lat," lon=",Lon," alt=",Alt," relAlt=",RelAlt)
+    }. */
+
+/* Direct MAVLink parameter examples.
+
+PARAM_REQUEST_READ fields:
+  (targetSystem, targetComponent, paramId, paramIndex)
+
+PARAM_SET fields:
+  (targetSystem, targetComponent, paramId, paramValue, paramType)
+
+Common use:
+  - keep paramIndex as -1 when reading by paramId
+  - for PX4 float parameters, use MAV_PARAM_TYPE_REAL32
+*/
+/* !demo_param_read.
++!demo_param_read
+  <-
+    .print("Demo: read one PX4 parameter through direct MAVLink.");
+    .param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1). */
+
+/* +paramvalue(Id,Value,Type,Count,Index)
+  <-
+    .print("PARAM_VALUE id=", Id, " value=", Value, " type=", Type,
+           " count=", Count, " index=", Index). */
+
+/* !demo_param_set.
++!demo_param_set
+  <-
+    .print("Demo: set one PX4 parameter through direct MAVLink.");
+    .param_set(1, 1, "MPC_Z_VEL_MAX_UP", 1.5, "MAV_PARAM_TYPE_REAL32"). */
+/* !demo_param_roundtrip.
++!demo_param_roundtrip
+  <-
+    .print("Demo: read, set, and read the same PX4 parameter through direct MAVLink.");
+    .param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1);
+    .wait(1000);
+    .param_set(1, 1, "MPC_Z_VEL_MAX_UP", 4.0, "MAV_PARAM_TYPE_REAL32");
+    .wait(1000);
+    .param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1). */
+
+/* Direct MAVLink parameter counter.
+
+Starts at 1 and only sends the next increment after PX4 confirms
+the last published value through PARAM_VALUE.
+*/
+!demo_param_counter.
+
++!demo_param_counter <-
+    -counter_step(_);
+    -expected_param_value(_);
+    -awaiting_readback(_);
+    +counter_step(0);
+    +expected_param_value(1);
+    +awaiting_readback(true);
+    .print("Starting direct MAVLink parameter counter at 1.");
+    .param_set(1, 1, "MPC_Z_VEL_MAX_UP", 1, "MAV_PARAM_TYPE_REAL32").
+    //.wait(150);
+    //.param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1). // Candidate to remove later if PARAM_SET alone already gives reliable PARAM_VALUE feedback.
+
++paramvalue("MPC_Z_VEL_MAX_UP",Value,_,_,_)
+  : expected_param_value(Expected) & counter_step(Step) & awaiting_readback(true)
+  <-
+    if (Value == Expected) {
+      -awaiting_readback(_);
+      .nano_time(Timestamp);
+      .print(Timestamp, ";", Step, ";", Value);
+      if (Step < 100) {
+        NextStep = Step + 1;
+        NextValue = Expected + 1;
+        -counter_step(_);
+        +counter_step(NextStep);
+        -expected_param_value(_);
+        +expected_param_value(NextValue);
+        +awaiting_readback(true);
+        .param_set(1, 1, "MPC_Z_VEL_MAX_UP", NextValue, "MAV_PARAM_TYPE_REAL32");
+        .wait(120)
+        //.param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1) // Candidate to remove later if PARAM_SET alone already gives reliable PARAM_VALUE feedback.
+      } else {
+        .print("Direct MAVLink parameter counter finished at value ", Value, ".");
+        -counter_step(_);
+        -expected_param_value(_)
+      }
     }.
