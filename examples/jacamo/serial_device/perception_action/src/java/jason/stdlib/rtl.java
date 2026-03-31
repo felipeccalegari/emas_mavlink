@@ -18,7 +18,6 @@ public class rtl extends embedded.mas.bridges.jacamo.defaultEmbeddedInternalActi
             arguments[0] =  createAtom("arduino1"); 
             arguments[1] =  createAtom( this.getClass().getSimpleName());
             arguments[2] = parameters;
-            System.out.println("[DEBUG arming.java] Sending to bridge -> " + arguments[1] + parameters.toString());
             return super.execute(ts, un,  arguments);            
         }
 }

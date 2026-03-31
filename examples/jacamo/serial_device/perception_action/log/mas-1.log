@@ -1,0 +1,31 @@
+[sample_agent] Demo: upload a short mission and start AUTO mission.
+[sample_agent] Attitude: roll=15496, pitch=-7.080589E-5, yaw=2.1823338E-4
+[sample_agent] [GPS] lat=473979710 lon=85461638 alt=226 relAlt=118
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Armed by external command\t
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Executing Mission\t
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Takeoff detected\t
+[sample_agent] Attitude: roll=22940, pitch=5.533159E-4, yaw=-0.0028665008
+[sample_agent] [GPS] lat=473979709 lon=85461634 alt=2847 relAlt=2638
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Mission finished, loitering\t
+[sample_agent] Attitude: roll=30196, pitch=0.018047512, yaw=-0.008975095
+[sample_agent] [GPS] lat=473980221 lon=85462115 alt=4208 relAlt=3998
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=50593792, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Returning to launch\t
+[sample_agent] [GPS] lat=473980209 lon=85462242 alt=4519 relAlt=4310
+[sample_agent] Attitude: roll=37456, pitch=7.696439E-5, yaw=-0.0030438611
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: RTL: land at destination\t
+[sample_agent] Attitude: roll=44736, pitch=-0.015910162, yaw=-0.01983837
+[sample_agent] [GPS] lat=473979765 lon=85461705 alt=6283 relAlt=6073
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=52004, pitch=-3.9039663E-4, yaw=-0.0040526316
+[sample_agent] [GPS] lat=473979709 lon=85461638 alt=1166 relAlt=957
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Landing detected\t
+[sample_agent] PX4 status [MAV_SEVERITY_INFO]: Disarmed by landing\t
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473979710 lon=85461630 alt=464 relAlt=254
+[sample_agent] Attitude: roll=59152, pitch=6.5651844E-4, yaw=-0.0042159725
+[sample_agent] [GPS] lat=473979712 lon=85461629 alt=471 relAlt=261
+[sample_agent] Attitude: roll=66296, pitch=5.576485E-4, yaw=-0.0043174154
