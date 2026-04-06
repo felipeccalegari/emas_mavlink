@@ -23,11 +23,11 @@ start_sampler() {
         count=1
         while true; do
             read cpu mem < <(
-                ps -p "$pid_list" -o %cpu=,%mem= 2>/dev/null |
+                ps -p "$pid_list" -o %cpu=,rss= 2>/dev/null |
                 awk '
                     BEGIN{sCPU=0;sMEM=0}
                     NF>=2{sCPU+=$1;sMEM+=$2}
-                    END{printf "%.2f %.2f\n",sCPU,sMEM}'
+                    END{printf "%.2f %.2f\n",sCPU,sMEM/1024}'
             )
 
             cpu="${cpu:-0.00}"
@@ -161,7 +161,7 @@ fi
 # -------------------------------------------------
 # Run benchmark for 80 seconds
 # -------------------------------------------------
-sleep 80
+sleep 30
 
 echo "$(date)"
 echo "Benchmark finished."

@@ -193,9 +193,19 @@ the last published value through PARAM_VALUE.
     +expected_param_value(1);
     +awaiting_readback(true);
     .print("Starting direct MAVLink parameter counter at 1.");
-    .param_set(1, 1, "MPC_Z_VEL_MAX_UP", 1, "MAV_PARAM_TYPE_REAL32").
+    !publish_expected_param.
     //.wait(150);
     //.param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1). // Candidate to remove later if PARAM_SET alone already gives reliable PARAM_VALUE feedback.
+
++!publish_expected_param
+  : expected_param_value(Expected) & awaiting_readback(true)
+  <-
+    // Retry until the corresponding PARAM_VALUE arrives.
+    .param_set(1, 1, "MPC_Z_VEL_MAX_UP", Expected, "MAV_PARAM_TYPE_REAL32");
+    .wait(1000);
+    if (awaiting_readback(true) & expected_param_value(Expected)) {
+      !publish_expected_param
+    }.
 
 +paramvalue("MPC_Z_VEL_MAX_UP",Value,_,_,_)
   : expected_param_value(Expected) & counter_step(Step) & awaiting_readback(true)
@@ -212,8 +222,7 @@ the last published value through PARAM_VALUE.
         -expected_param_value(_);
         +expected_param_value(NextValue);
         +awaiting_readback(true);
-        .param_set(1, 1, "MPC_Z_VEL_MAX_UP", NextValue, "MAV_PARAM_TYPE_REAL32");
-        .wait(120)
+        !publish_expected_param
         //.param_request_read(1, 1, "MPC_Z_VEL_MAX_UP", -1) // Candidate to remove later if PARAM_SET alone already gives reliable PARAM_VALUE feedback.
       } else {
         .print("MAVLink parameter counter finished at value ", Value, ".");
@@ -222,4 +231,3 @@ the last published value through PARAM_VALUE.
       }
     }. */
 /* End of MAVLink parameter counter. */
-
