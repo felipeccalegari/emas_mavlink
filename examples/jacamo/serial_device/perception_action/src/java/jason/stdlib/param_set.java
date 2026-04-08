@@ -13,7 +13,15 @@ public class param_set extends embedded.mas.bridges.jacamo.defaultEmbeddedIntern
         @Override
         public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
             ListTermImpl parameters = new ListTermImpl();
-            for(Term t:args) parameters.add(t);
+            if (args.length == 2) {
+                parameters.add(createAtom("1"));
+                parameters.add(createAtom("1"));
+                parameters.add(args[0]);
+                parameters.add(args[1]);
+                parameters.add(createAtom("MAV_PARAM_TYPE_REAL32"));
+            } else {
+                for (Term t : args) parameters.add(t);
+            }
             Term[] arguments = new Term[3];
             arguments[0] =  createAtom("arduino1"); 
             arguments[1] =  createAtom( this.getClass().getSimpleName());
