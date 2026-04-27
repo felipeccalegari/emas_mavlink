@@ -15,8 +15,9 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
         private static final int TARGET_COMPONENT = 1;
         private static final int MAV_FRAME_LOCAL_NED = 1;
         private static final int POSITION_ONLY_TYPE_MASK = 3576;
+        private static final double YAW_RESET_GROUND_ZNED = -0.5;
 
-        private RelativeSetpoint lastRelativeSetpoint;
+        private Double frozenYaw;
 
         @Override
         public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -55,23 +56,22 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
 
         private RelativeSetpoint relativeSetpoint(TransitionSystem ts, double forward, double right, double up)
                 throws Exception {
-            if (lastRelativeSetpoint != null && lastRelativeSetpoint.matches(forward, right, up)) {
-                return lastRelativeSetpoint;
+            LocalPose pose = currentLocalPose(ts);
+            if (frozenYaw == null || pose.zned > YAW_RESET_GROUND_ZNED) {
+                frozenYaw = pose.yaw;
             }
 
-            LocalPose pose = currentLocalPose(ts);
-            double deltaX = (forward * Math.cos(pose.yaw)) - (right * Math.sin(pose.yaw));
-            double deltaY = (forward * Math.sin(pose.yaw)) + (right * Math.cos(pose.yaw));
+            double deltaX = (forward * Math.cos(frozenYaw)) - (right * Math.sin(frozenYaw));
+            double deltaY = (forward * Math.sin(frozenYaw)) + (right * Math.cos(frozenYaw));
             double deltaZned = -up;
 
-            lastRelativeSetpoint = new RelativeSetpoint(
+            return new RelativeSetpoint(
                 forward,
                 right,
                 up,
                 pose.x + deltaX,
                 pose.y + deltaY,
                 pose.zned + deltaZned);
-            return lastRelativeSetpoint;
         }
 
         private static double numberArg(Term arg, String name) throws Exception {
@@ -134,10 +134,5 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
                 this.targetZned = targetZned;
             }
 
-            boolean matches(double forward, double right, double up) {
-                return Double.compare(this.forward, forward) == 0
-                    && Double.compare(this.right, right) == 0
-                    && Double.compare(this.up, up) == 0;
-            }
         }
 }
