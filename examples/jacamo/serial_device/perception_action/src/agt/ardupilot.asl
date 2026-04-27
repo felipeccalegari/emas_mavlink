@@ -94,7 +94,7 @@ last_gps_ns(0).
 /* End of GUIDED mode - low-level for Ardupilot */
 
 /* "High-level" body-relative position example for ArduPilot GUIDED mode. */
-!demo_offboard_body_relative_position.
+/* !demo_offboard_body_relative_position.
 
 +!demo_offboard_body_relative_position
   : not nav_pose_local(_,_,_,_) & not guided_pose_stream_requested
@@ -140,5 +140,64 @@ last_gps_ns(0).
     .wait(5000);
     .rtl;
     .wait(200);
-    .print("Returning to launch and finishing GUIDED body-relative demo.").
+    .print("Returning to launch and finishing GUIDED body-relative demo."). */
 /* End of high-level body-relative position example for ArduPilot GUIDED mode. */
+
+/* High-level relative position example for ArduPilot GUIDED mode ending with LAND. */
+!demo_guided_relative_cross_land.
+
++!demo_guided_relative_cross_land
+  : not nav_pose_local(_,_,_,_) & not guided_pose_stream_requested
+  <-
+    +guided_pose_stream_requested;
+    .set_message_interval(30, 500000, 0, 0, 0, 0, 0); // ATTITUDE at 2 Hz
+    .set_message_interval(32, 500000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 2 Hz
+    .print("Waiting for local pose before GUIDED relative LAND demo...");
+    .wait(500);
+    !demo_guided_relative_cross_land.
+
++!demo_guided_relative_cross_land
+  : not nav_pose_local(_,_,_,_) & guided_pose_stream_requested
+  <-
+    .wait(500);
+    !demo_guided_relative_cross_land.
+
++!demo_guided_relative_cross_land
+  : nav_pose_local(_,_,_,_)
+  <-
+    .print("Demo: take off 2m, test body-relative moves, then land.");
+
+    .set_mode(1, 4, 0); // custom-mode-enabled=1, mode=4 (GUIDED), unused=0
+    .wait(1000);
+
+    .arming(1);
+    .wait(3000);
+
+    .takeoff(0, 0, 0, 0, 0, 0, 2.0);
+    .print("Taking off to 2m and waiting for altitude to stabilize...");
+    .wait(20000);
+
+    .sp_local(2.0, 0.0, 0.0); // 2 m forward
+    .wait(5000);
+    .sp_local(-2.0, 0.0, 0.0); // back 2 m
+    .wait(5000);
+
+    .sp_local(0.0, 2.0, 0.0); // 2 m right
+    .wait(5000);
+    .sp_local(0.0, -2.0, 0.0); // back 2 m
+    .wait(5000);
+
+    .sp_local(0.0, -2.0, 0.0); // 2 m left
+    .wait(5000);
+    .sp_local(0.0, 2.0, 0.0); // back 2 m
+    .wait(5000);
+
+    .sp_local(-2.0, 0.0, 0.0); // 2 m backward
+    .wait(5000);
+    .sp_local(2.0, 0.0, 0.0); // back 2 m
+    .wait(5000);
+
+    .land(0, 0, 0, 0, 0, 0, 0.0);
+    .wait(200);
+    .print("Landing and finishing GUIDED relative LAND demo.").
+/* End of high-level relative position example for ArduPilot GUIDED mode ending with LAND. */
