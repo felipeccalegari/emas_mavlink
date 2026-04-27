@@ -26,9 +26,9 @@
 
 /* End of Takeoff and RTL example for Ardupilot. */
 
+/* Start of GUIDED mode - low-level for Ardupilot. */
 
-
-gps_gap_ns(1000000000).
+/* gps_gap_ns(1000000000).
 last_gps_ns(0).
 +globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
   : not home_gps(_,_) & last_gps_ns(Last) & gps_gap_ns(Gap)
@@ -90,8 +90,8 @@ last_gps_ns(0).
     .wait(20000);
 
     .rtl;
-    .print("Returning to launch...").
-
+    .print("Returning to launch..."). */
+/* End of GUIDED mode - low-level for Ardupilot */
 
 /* "High-level" body-relative position example for ArduPilot GUIDED mode. */
 !demo_offboard_body_relative_position.
