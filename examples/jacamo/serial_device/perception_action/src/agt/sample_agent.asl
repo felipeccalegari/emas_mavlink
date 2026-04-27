@@ -145,9 +145,20 @@ last_gps_ns(0). */
     }. */
 /* End of Mavlink ATTITUDE perception example */
 
-/* Mavlink SYS_STATUS perception example.
-Note: PX4 is not sending Battery data via telemetry, will update code once figure out how to adjust it.
+/* Mavlink battery perception example.
+Battery(PNorm, PRaw, VoltageV, CurrentA)
+PNorm is normalized to [0.0, 1.0] so it matches MAVROS-style threshold checks more closely.
+PRaw is the MAVLink battery_remaining field in [0,100].
+VoltageV/CurrentA are -1 when PX4 does not provide them.
 */
+/* +battery(PNorm,PRaw,VoltageV,CurrentA)
+  <-
+    if (PNorm >= 0 & PNorm < 0.55) {
+      .print("Battery getting low: raw=", PRaw, "% voltage=", VoltageV, "V current=", CurrentA, "A")
+    }. */
+/* End of Mavlink battery perception example */
+
+/* Mavlink SYS_STATUS perception example. */
 /* +sysstatus(_,_,_,_,_,_,_,BatteryRemaining,_,_,_,_,_)
   : last_sys_ns(Last) & sys_gap_ns(Gap)
   <-
@@ -183,7 +194,7 @@ Note: PX4 is not sending Battery data via telemetry, will update code once figur
 Starts at 1 and only sends the next increment after PX4 confirms
 the last published value through PARAM_VALUE.
 */
-!demo_param_counter.
+/* !demo_param_counter.
 
 +!demo_param_counter <-
     -counter_step(_);
@@ -218,5 +229,62 @@ the last published value through PARAM_VALUE.
         -counter_step(_);
         -expected_param_value(_)
       }
-    }.
+    }. */
 /* End of MAVLink parameter counter. */
+
+/* "High-level" Offboard example for PX4. */
+!demo_offboard_body_relative_position.
++!demo_offboard_body_relative_position
+  : not nav_pose_local(_,_,_,_)
+  <-
+    .print("Waiting for nav pose...");
+    .wait(500);
+    !demo_offboard_body_relative_position.
+
++!demo_offboard_body_relative_position
+  : nav_pose_local(_,_,_,_)
+  <-
+    .print("Demo: Offboard mode using high-level setpoint local with (Forward, Right, Up).");
+    -offboard_body_relative_stream_enabled;
+    +offboard_body_relative_stream_enabled;
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, 0.0, 2.0); // take off 2 m relative to the current pose
+    !!offboard_body_relative_position_stream;
+    .wait(1200);
+    .set_mode(1, 6, 0); // (custom enabled, PX4 OFFBOARD main custom mode, no submode)
+    .wait(500);
+    .arming(1);
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, -3.0, 0.0); // move 3 m to the drone's current left
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(2.0, 0.0, 0.0); // then move 2 m forward from the drone's current heading
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(2.0, 2.0, 0.0); // forward-right
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, 3.0, 0.0); // move 3 m to the drone's current right
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(-2.0, 0.0, 0.0); // move 2 m backward from the drone's current heading
+    .wait(5000);
+    -offboard_body_relative_stream_enabled;
+    -body_relative_target(_,_,_);
+    .rtl;
+    .wait(200);
+    .print("Returning to launch and finishing flight.").
+
++!offboard_body_relative_position_stream
+  : body_relative_target(Forward, Right, Up) & offboard_body_relative_stream_enabled
+  <-
+    .sp_local(Forward, Right, Up);
+    .wait(100);
+    !offboard_body_relative_position_stream.
+
++!offboard_body_relative_position_stream
+  : not offboard_body_relative_stream_enabled
+  <-
+    true.
+/* End of Offboard "High-level" position example for PX4. */

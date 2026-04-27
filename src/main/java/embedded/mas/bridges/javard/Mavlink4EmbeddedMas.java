@@ -31,8 +31,13 @@ import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import io.dronefleet.mavlink.MavlinkConnection;
 import io.dronefleet.mavlink.MavlinkMessage;
+import io.dronefleet.mavlink.common.Attitude;
 import io.dronefleet.mavlink.common.CommandInt;
 import io.dronefleet.mavlink.common.CommandLong;
+import io.dronefleet.mavlink.common.GlobalPositionInt;
+import io.dronefleet.mavlink.common.GpsGlobalOrigin;
+import io.dronefleet.mavlink.common.HomePosition;
+import io.dronefleet.mavlink.common.LocalPositionNed;
 import io.dronefleet.mavlink.common.MavCmd;
 import io.dronefleet.mavlink.common.MavFrame;
 import io.dronefleet.mavlink.common.MavMode;
@@ -70,6 +75,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     private boolean missionBusy = false;
     private boolean heartbeatRunning = false;
     private boolean mavRxRunning = false;
+    private boolean telemetryRequestsSent = false;
 
     private MavlinkConnection mavTxConn;
     private ByteArrayOutputStream mavTxOut;
@@ -80,6 +86,10 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     private BlockingQueue<Object> missionProtocolQueue;
     private Map<String, Long> telemetryEmitMs;
     private Map<String, String> latestTelemetryJsonByKey;
+    private LocalPose latestLocalPose;
+    private GlobalPose latestGlobalPose;
+    private LocalOrigin latestLocalOrigin;
+    private Double latestYawRad;
 
     private static class MissionWp {
         final double latDeg;
@@ -92,6 +102,46 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
             this.lonDeg = lonDeg;
             this.altM = altM;
             this.isTakeoff = isTakeoff;
+        }
+    }
+
+    private static class LocalPose {
+        final double x;
+        final double y;
+        final double zned;
+
+        LocalPose(double x, double y, double zned) {
+            this.x = x;
+            this.y = y;
+            this.zned = zned;
+        }
+    }
+
+    private static class GlobalPose {
+        final double latDeg;
+        final double lonDeg;
+        final double relAltM;
+
+        GlobalPose(double latDeg, double lonDeg, double relAltM) {
+            this.latDeg = latDeg;
+            this.lonDeg = lonDeg;
+            this.relAltM = relAltM;
+        }
+    }
+
+    private static class LocalOrigin {
+        final double latDeg;
+        final double lonDeg;
+        final double x;
+        final double y;
+        final double zned;
+
+        LocalOrigin(double latDeg, double lonDeg, double x, double y, double zned) {
+            this.latDeg = latDeg;
+            this.lonDeg = lonDeg;
+            this.x = x;
+            this.y = y;
+            this.zned = zned;
         }
     }
 
@@ -113,6 +163,15 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
             MavCmd.MAV_CMD_NAV_TAKEOFF,
             MavCmd.MAV_CMD_DO_REPOSITION
     ));
+
+    private static final int MAVLINK_MSG_ID_SYS_STATUS = 1;
+    private static final int MAVLINK_MSG_ID_ATTITUDE = 30;
+    private static final int MAVLINK_MSG_ID_LOCAL_POSITION_NED = 32;
+    private static final int MAVLINK_MSG_ID_GLOBAL_POSITION_INT = 33;
+    private static final int MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN = 49;
+    private static final int MAVLINK_MSG_ID_BATTERY_STATUS = 147;
+    private static final int MAVLINK_MSG_ID_HOME_POSITION = 242;
+    private static final double EARTH_RADIUS_M = 6378137.0;
 
     public Mavlink4EmbeddedMas(String portDescription, int baudRate)
             throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException {
@@ -180,6 +239,11 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                 return "";
             }
 
+            String navPoseJson = navPoseToJson();
+            if (navPoseJson != null && !navPoseJson.isEmpty()) {
+                cacheLatestTelemetry(navPoseJson);
+            }
+
             String mav = readMavlinkTelemetryNonBlocking();
             if (mav != null && !mav.isEmpty()) return mav;
 
@@ -197,12 +261,17 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         missionProtocolQueue = new LinkedBlockingQueue<>();
         telemetryEmitMs = new ConcurrentHashMap<>();
         latestTelemetryJsonByKey = new LinkedHashMap<>();
+        latestLocalPose = null;
+        latestGlobalPose = null;
+        latestLocalOrigin = null;
+        latestYawRad = null;
         missionBuffer = new ArrayList<>();
 
         try { ensureMavlinkTx(); } catch (Exception ignored) {}
         try { initMavlinkRx(); } catch (Exception ignored) {}
         startMavlinkReader();
         startGcsHeartbeat();
+        requestDefaultTelemetryStreams();
         mavlinkStarted = true;
     }
 
@@ -270,6 +339,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                     if (msg == null || msg.getPayload() == null) continue;
 
                     Object payload = msg.getPayload();
+                    updateNavigationState(payload);
 
                     if (payload instanceof Timesync) {
                         Timesync ts = (Timesync) payload;
@@ -294,6 +364,16 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                     String json = mavPayloadToJson(payload);
                     if (json != null && !json.isEmpty()) {
                         cacheLatestTelemetry(json);
+                    }
+
+                    String batteryJson = mavPayloadToBatteryJson(payload);
+                    if (batteryJson != null && !batteryJson.isEmpty()) {
+                        cacheLatestTelemetry(batteryJson);
+                    }
+
+                    String navPoseJson = navPoseToJson();
+                    if (navPoseJson != null && !navPoseJson.isEmpty()) {
+                        cacheLatestTelemetry(navPoseJson);
                     }
                 } catch (Exception e) {
                     if (mavRxRunning) {
@@ -348,6 +428,107 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         sendMavlink(hb);
     }
 
+    // Requests the telemetry streams that the agent relies on for perceptions that PX4 may not emit by default.
+    private synchronized void requestDefaultTelemetryStreams() {
+        if (telemetryRequestsSent) return;
+
+        try {
+            requestMessageInterval(MAVLINK_MSG_ID_ATTITUDE, 10);
+            requestMessageInterval(MAVLINK_MSG_ID_LOCAL_POSITION_NED, 10);
+            requestMessageInterval(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, 10);
+            requestMessageInterval(MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN, 1);
+            requestMessageInterval(MAVLINK_MSG_ID_SYS_STATUS, 2);
+            requestMessageInterval(MAVLINK_MSG_ID_BATTERY_STATUS, 2);
+            requestSingleMessage(MAVLINK_MSG_ID_HOME_POSITION);
+            telemetryRequestsSent = true;
+        } catch (Exception e) {
+            System.err.println("[NRJ] MAVLink telemetry request failed, will retry on next init.");
+        }
+    }
+
+    private void requestMessageInterval(int messageId, int rateHz) throws IOException {
+        if (rateHz <= 0) return;
+
+        long intervalUs = 1_000_000L / rateHz;
+        CommandLong msg = CommandLong.builder()
+                .targetSystem((short) targetSystem)
+                .targetComponent((short) targetComponent)
+                .command(MavCmd.MAV_CMD_SET_MESSAGE_INTERVAL)
+                .confirmation((short) 0)
+                .param1((float) messageId)
+                .param2((float) intervalUs)
+                .param3(0f).param4(0f).param5(0f).param6(0f).param7(0f)
+                .build();
+        sendMavlink(msg);
+    }
+
+    private void requestSingleMessage(int messageId) throws IOException {
+        CommandLong msg = CommandLong.builder()
+                .targetSystem((short) targetSystem)
+                .targetComponent((short) targetComponent)
+                .command(MavCmd.MAV_CMD_REQUEST_MESSAGE)
+                .confirmation((short) 0)
+                .param1((float) messageId)
+                .param2(0f).param3(0f).param4(0f).param5(0f).param6(0f).param7(0f)
+                .build();
+        sendMavlink(msg);
+    }
+
+    private void updateNavigationState(Object payload) {
+        if (payload instanceof LocalPositionNed) {
+            LocalPositionNed p = (LocalPositionNed) payload;
+            latestLocalPose = new LocalPose(p.x(), p.y(), p.z());
+            return;
+        }
+
+        if (payload instanceof GlobalPositionInt) {
+            GlobalPositionInt p = (GlobalPositionInt) payload;
+            latestGlobalPose = new GlobalPose(p.lat() / 1e7, p.lon() / 1e7, p.relativeAlt() / 1000.0);
+            return;
+        }
+
+        if (payload instanceof Attitude) {
+            latestYawRad = (double) ((Attitude) payload).yaw();
+            return;
+        }
+
+        if (payload instanceof GpsGlobalOrigin) {
+            GpsGlobalOrigin p = (GpsGlobalOrigin) payload;
+            latestLocalOrigin = new LocalOrigin(p.latitude() / 1e7, p.longitude() / 1e7, 0.0, 0.0, 0.0);
+            return;
+        }
+
+        if (payload instanceof HomePosition) {
+            HomePosition p = (HomePosition) payload;
+            latestLocalOrigin = new LocalOrigin(p.latitude() / 1e7, p.longitude() / 1e7, p.x(), p.y(), p.z());
+        }
+    }
+
+    private String navPoseToJson() {
+        if (latestYawRad == null) {
+            return "";
+        }
+
+        LocalPose pose = latestLocalPose;
+        if (pose == null && latestGlobalPose != null && latestLocalOrigin != null) {
+            pose = globalToLocalPose(latestGlobalPose, latestLocalOrigin);
+        }
+
+        if (pose == null) {
+            return "";
+        }
+
+        return "{\"nav_pose_local\":[" + pose.x + "," + pose.y + "," + pose.zned + "," + latestYawRad + "]}";
+    }
+
+    private LocalPose globalToLocalPose(GlobalPose pose, LocalOrigin origin) {
+        double lat0Rad = Math.toRadians(origin.latDeg);
+        double north = Math.toRadians(pose.latDeg - origin.latDeg) * EARTH_RADIUS_M;
+        double east = Math.toRadians(pose.lonDeg - origin.lonDeg) * EARTH_RADIUS_M * Math.cos(lat0Rad);
+        double zned = origin.zned - pose.relAltM;
+        return new LocalPose(origin.x + north, origin.y + east, zned);
+    }
+
     // Returns the newest telemetry snapshot and clears the cache.
     private String readMavlinkTelemetryNonBlocking() {
         synchronized (latestTelemetryJsonByKey) {
@@ -386,7 +567,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         if (key.isEmpty()) return;
 
         long now = System.currentTimeMillis();
-        boolean throttleEnabled = !"paramvalue".equals(key);
+        boolean throttleEnabled = !"paramvalue".equals(key) && !"nav_pose_local".equals(key);
         if (throttleEnabled) {
             Long last = telemetryEmitMs.get(key);
             long minGapMs = 100L;
@@ -441,6 +622,101 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
             return sb.toString();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private String mavPayloadToBatteryJson(Object payload) {
+        try {
+            String simpleName = payload.getClass().getSimpleName();
+            Integer rawPercent = getIntField(payload, "batteryRemaining");
+
+            if (rawPercent == null || rawPercent.intValue() < 0) {
+                return "";
+            }
+
+            Double voltageV = null;
+            Double currentA = null;
+
+            if ("BatteryStatus".equals(simpleName)) {
+                voltageV = getBatteryStatusVoltage(payload);
+                Integer currentBattery = getIntField(payload, "currentBattery");
+                if (currentBattery != null && currentBattery.intValue() >= 0) {
+                    currentA = currentBattery.doubleValue() / 100.0;
+                }
+            } else if ("SysStatus".equals(simpleName)) {
+                Integer voltageBattery = getIntField(payload, "voltageBattery");
+                if (voltageBattery != null && voltageBattery.intValue() > 0 && voltageBattery.intValue() < 65535) {
+                    voltageV = voltageBattery.doubleValue() / 1000.0;
+                }
+
+                Integer currentBattery = getIntField(payload, "currentBattery");
+                if (currentBattery != null && currentBattery.intValue() >= 0) {
+                    currentA = currentBattery.doubleValue() / 100.0;
+                }
+            } else {
+                return "";
+            }
+
+            double normalizedPercent = rawPercent.doubleValue() / 100.0;
+
+            StringBuilder sb = new StringBuilder(96);
+            sb.append("{\"battery\":[");
+            sb.append(normalizedPercent);
+            sb.append(",");
+            sb.append(rawPercent.intValue());
+            sb.append(",");
+            if (voltageV != null) sb.append(voltageV.doubleValue());
+            else sb.append(-1);
+            sb.append(",");
+            if (currentA != null) sb.append(currentA.doubleValue());
+            else sb.append(-1);
+            sb.append("]}");
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private Integer getIntField(Object payload, String fieldName) {
+        try {
+            Field field = payload.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Object value = field.get(payload);
+            if (value instanceof Number) {
+                return Integer.valueOf(((Number) value).intValue());
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private Double getBatteryStatusVoltage(Object payload) {
+        try {
+            Field voltagesField = payload.getClass().getDeclaredField("voltages");
+            voltagesField.setAccessible(true);
+            Object value = voltagesField.get(payload);
+            if (value == null || !value.getClass().isArray()) {
+                return null;
+            }
+
+            double totalMv = 0.0;
+            int length = Array.getLength(value);
+            for (int i = 0; i < length; i++) {
+                Object cellValue = Array.get(value, i);
+                if (!(cellValue instanceof Number)) continue;
+
+                int mv = ((Number) cellValue).intValue();
+                if (mv <= 0 || mv >= 65535) continue;
+                totalMv += mv;
+            }
+
+            if (totalMv <= 0.0) {
+                return null;
+            }
+
+            return totalMv / 1000.0;
+        } catch (Exception ignored) {
+            return null;
         }
     }
 
@@ -993,6 +1269,39 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         throw new Exception("Unsupported builder argument type: " + t.getName() + " for value " + raw);
     }
 
+    private void sendDoSetMode(String[] params) throws Exception {
+        if (params.length < 3) {
+            throw new Exception("MAV_CMD_DO_SET_MODE requires either (baseMode, mainMode, subMode) or legacy (targetSystem, baseMode, customMode)");
+        }
+
+        float param1;
+        float param2;
+        float param3;
+
+        if (params.length >= 4) {
+            param1 = toFloat(params[1]);
+            param2 = toFloat(params[2]);
+            param3 = toFloat(params[3]);
+        } else {
+            long third = Long.parseLong(params[2].trim());
+
+            if (third > 255L) {
+                param1 = toFloat(params[1]);
+                param2 = (third >> 16) & 0xFF;
+                param3 = (third >> 24) & 0xFF;
+            } else {
+                param1 = toFloat(params[0]);
+                param2 = toFloat(params[1]);
+                param3 = toFloat(params[2]);
+            }
+        }
+
+        sendCommandLong(
+                MavCmd.MAV_CMD_DO_SET_MODE,
+                new String[] { Float.toString(param1), Float.toString(param2), Float.toString(param3) }
+        );
+    }
+
     // Dispatches parsed MAVLink commands to the specific send/upload helper (most used commands).
     private void processMavlinkCommand(String text) throws Exception {
         ParsedCommand cmd = parseCommand(text);
@@ -1000,18 +1309,12 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         String[] params = cmd.params;
 
         if ("SET_MODE".equals(name)) {
-            if (params.length < 3) throw new Exception("SET_MODE requires (targetSystem, baseMode, customMode)");
+            sendDoSetMode(params);
+            return;
+        }
 
-            int tgtSys = toInt(params[0]);
-            int baseMode = toInt(params[1]);
-            long customMode = Long.parseLong(params[2].trim());
-
-            io.dronefleet.mavlink.common.SetMode msg = io.dronefleet.mavlink.common.SetMode.builder()
-                    .targetSystem((short) tgtSys)
-                    .baseMode(EnumValue.create(MavMode.class, baseMode))
-                    .customMode(customMode)
-                    .build();
-            sendMavlink(msg);
+        if ("MAV_CMD_DO_SET_MODE".equals(name)) {
+            sendDoSetMode(params);
             return;
         }
 

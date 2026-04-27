@@ -145,9 +145,20 @@ last_gps_ns(0). */
     }. */
 /* End of Mavlink ATTITUDE perception example */
 
-/* Mavlink SYS_STATUS perception example.
-Note: PX4 is not sending Battery data via telemetry, will update code once figure out how to adjust it.
+/* Mavlink battery perception example.
+Battery(PNorm, PRaw, VoltageV, CurrentA)
+PNorm is normalized to [0.0, 1.0] so it matches MAVROS-style threshold checks more closely.
+PRaw is the MAVLink battery_remaining field in [0,100].
+VoltageV/CurrentA are -1 when PX4 does not provide them.
 */
+/* +battery(PNorm,PRaw,VoltageV,CurrentA)
+  <-
+    if (PNorm >= 0 & PNorm < 0.55) {
+      .print("Battery getting low: raw=", PRaw, "% voltage=", VoltageV, "V current=", CurrentA, "A")
+    }. */
+/* End of Mavlink battery perception example */
+
+/* Mavlink SYS_STATUS perception example. */
 /* +sysstatus(_,_,_,_,_,_,_,BatteryRemaining,_,_,_,_,_)
   : last_sys_ns(Last) & sys_gap_ns(Gap)
   <-
@@ -183,7 +194,7 @@ Note: PX4 is not sending Battery data via telemetry, will update code once figur
 Starts at 1 and only sends the next increment after PX4 confirms
 the last published value through PARAM_VALUE.
 */
-!demo_param_counter.
+/* !demo_param_counter.
 
 +!demo_param_counter <-
     -counter_step(_);
@@ -218,5 +229,117 @@ the last published value through PARAM_VALUE.
         -counter_step(_);
         -expected_param_value(_)
       }
-    }.
+    }. */
 /* End of MAVLink parameter counter. */
+
+/* Offboard mode example. */
+/* !demo_offboard.
++!demo_offboard <-
+    .print("Demo: keep publishing local setpoints -> OFFBOARD -> arm -> move to x=5.0, y=0.0, z=-3.0.");
+    !!offboard_stream;
+    .wait(1200);
+    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main mode, no submode
+    .wait(500);
+    .arming(1).
+
++!offboard_stream
+  <-
+    // First parameter is kept as a placeholder so the remaining values match the current sp_local bridge parser.
+    // Frame 1 = MAV_FRAME_LOCAL_NED. Type mask 3576 = use position only (ignore velocity, acceleration and yaw fields).
+    .sp_local(0, 1, 1, 1, 3576, 5.0, 0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    .wait(100);
+    !offboard_stream. */
+/* End of Offboard mode example. */
+
+/* Offboard BODY_NED velocity example. */
+/* !demo_offboard_body.
++!demo_offboard_body <-
+    .print("Demo: OFFBOARD with body-frame velocity steps (forward/right/up relative to current heading).");
+    -body_velocity(_,_,_);
+    +body_velocity(0.0, 0.0, -0.5);
+    !!offboard_body_stream;
+    .wait(1200);
+    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main mode, no submode
+    .wait(500);
+    .arming(1);
+    .wait(4000);
+    -body_velocity(_,_,_);
+    +body_velocity(0.8, 0.0, 0.0); // fly forward
+    .wait(3000);
+    -body_velocity(_,_,_);
+    +body_velocity(0.0, 0.6, 0.0); // fly right
+    .wait(3000);
+    -body_velocity(_,_,_);
+    +body_velocity(0.8, 0.0, 0.0); // fly forward again
+    .wait(3000);
+    -body_velocity(_,_,_);
+    +body_velocity(0.0, 0.0, 0.0). // stop and hold
+
++!offboard_body_stream
+  : body_velocity(Vx, Vy, Vz)
+  <-
+    // First parameter is kept as a placeholder so the remaining values match the current sp_local bridge parser.
+    // Frame 8 = MAV_FRAME_BODY_NED, which PX4 supports for velocity setpoints.
+    // Vx = forward, Vy = right, Vz = down in the vehicle body frame.
+    // Type mask 3527 = ignore position, acceleration, yaw and yaw rate; use only body-frame velocity.
+    .sp_local(0, 1, 1, 8, 3527, 0.0, 0.0, 0.0, Vx, Vy, Vz, 0.0, 0.0, 0.0, 0.0, 0.0);
+    .wait(100);
+    !offboard_body_stream. */
+/* End of Offboard BODY_NED velocity example. */
+
+/* Body-relative position example. */
+!demo_offboard_body_relative_position.
++!demo_offboard_body_relative_position
+  : not nav_pose_local(_,_,_,_)
+  <-
+    .print("Waiting for nav pose...");
+    .wait(500);
+    !demo_offboard_body_relative_position.
+
++!demo_offboard_body_relative_position
+  : nav_pose_local(_,_,_,_)
+  <-
+    .print("Demo: body-relative position offsets using high-level sp_local(Forward, Right, Up).");
+    -offboard_body_relative_stream_enabled;
+    +offboard_body_relative_stream_enabled;
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, 0.0, 2.0); // take off 2 m relative to the current pose
+    !offboard_body_relative_position_stream;
+    .wait(1200);
+    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main custom mode, no submode
+    .wait(500);
+    .arming(1);
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, -3.0, 0.0); // move 3 m to the drone's current left
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(2.0, 0.0, 0.0); // then move 2 m forward from the drone's current heading
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(2.0, 2.0, 0.0); // forward-right
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(0.0, 3.0, 0.0); // move 3 m to the drone's current right
+    .wait(5000);
+    -body_relative_target(_,_,_);
+    +body_relative_target(-2.0, 0.0, 0.0); // move 2 m backward from the drone's current heading
+    .wait(5000);
+    -offboard_body_relative_stream_enabled;
+    -body_relative_target(_,_,_);
+    .rtl;
+    .wait(200);
+    .print("Returning to launch and finishing flight.").
+
++!offboard_body_relative_position_stream
+  : body_relative_target(Forward, Right, Up) & offboard_body_relative_stream_enabled
+  <-
+    .sp_local(Forward, Right, Up);
+    .wait(100);
+    !offboard_body_relative_position_stream.
+
++!offboard_body_relative_position_stream
+  : not offboard_body_relative_stream_enabled
+  <-
+    true.
+/* End of Body-relative position example. */

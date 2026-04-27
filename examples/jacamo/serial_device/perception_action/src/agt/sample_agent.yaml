@@ -12,7 +12,7 @@
       - actionName: takeoff
         actuationName: MAV_CMD_NAV_TAKEOFF
       - actionName: set_mode
-        actuationName: SET_MODE # MAV_CMD_DO_SET_MODE is not supported px4 >= 1.15
+        actuationName: MAV_CMD_DO_SET_MODE
       - actionName: waypoint
         actuationName: MAV_CMD_NAV_WAYPOINT
       - actionName: reposition
