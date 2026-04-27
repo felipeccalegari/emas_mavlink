@@ -288,3 +288,4 @@ the last published value through PARAM_VALUE.
   <-
     true.
 /* End of Offboard "High-level" position example for PX4. */
+

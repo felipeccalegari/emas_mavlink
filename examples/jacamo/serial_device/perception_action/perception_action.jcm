@@ -18,6 +18,11 @@ mas architecture_1 {
       ag-class: embedded.mas.bridges.jacamo.CyberPhysicalAgent      
       ag-arch: embedded.mas.bridges.jacamo.DefaultEmbeddedAgArch
     }
+    /* 
+    agent ardupilot{
+      ag-class: embedded.mas.bridges.jacamo.CyberPhysicalAgent      
+      ag-arch: embedded.mas.bridges.jacamo.DefaultEmbeddedAgArch
+    } */
 
 
 
