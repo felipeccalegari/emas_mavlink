@@ -11,7 +11,7 @@
     .set_message_interval(32, 500000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 2 Hz
     .set_message_interval(33, 500000, 0, 0, 0, 0, 0); // GLOBAL_POSITION_INT at 2 Hz
     .wait(1000);
-    .set_mode(1, 1, 4);      // targetSystem=1, custom-mode-enabled=1, ArduCopter GUIDED=4
+    .set_mode(1, 4, 0);      // custom-mode-enabled=1, ArduCopter GUIDED=4, submode/unused=0
     .wait(1000);
     .print("Mode set to Guided");
     .arming(1);
@@ -68,8 +68,8 @@ last_gps_ns(0).
 
     .wait(1000);
 
-    // ArduCopter GUIDED mode: targetSystem=1, baseMode=1, customMode=4
-    .set_mode(1, 1, 4);
+    // ArduCopter GUIDED mode: custom-mode-enabled=1, mode=4 (GUIDED), unused=0
+    .set_mode(1, 4, 0);
     .wait(1000);
 
     .arming(1);
@@ -117,8 +117,8 @@ last_gps_ns(0).
   <-
     .print("Demo: GUIDED mode using high-level sp_local(Forward, Right, Up).");
 
-    // ArduCopter GUIDED mode: targetSystem=1, custom-mode-enabled=1, customMode=4
-    .set_mode(1, 1, 4);
+    // ArduCopter GUIDED mode: custom-mode-enabled=1, mode=4 (GUIDED), unused=0
+    .set_mode(1, 4, 0);
     .wait(1000);
 
     .arming(1);
