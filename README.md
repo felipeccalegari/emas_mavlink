@@ -2,7 +2,8 @@
 Customized classes from Embedded-Mas framework to work with MAVLink protocol using DroneFleet 1.1.11 library.
 
 ### Environment:
-- Ubuntu 24.04 machine running PX4 v1.17 with Gazebo
+- Ubuntu 24.04 machine running PX4 v1.16 with Gazebo
+- Java JDK version = 21
 - Raspberry Pi 5 (Jason Agents) <-Serial-> Raspberry Pi 4 (Send/Receive messages) <-UDP-> Ubuntu/PX4 Simulation
 - Simulation startup scripts were adapted to connect with Raspberry Pi 4 IP and then started with: `MAV_BROADCAST=1 make px4_sitl gz_x500`
 
@@ -24,16 +25,15 @@ Customized classes from Embedded-Mas framework to work with MAVLink protocol usi
 
 - Agent can:
   - Arm.
-  - Set modes (Tested: AUTO.TAKEOFF and AUTO.MISSION).
+  - Set modes (Tested: AUTO.TAKEOFF, AUTO.MISSION and OFFBOARD).
+    - Note: OFFBOARD mode is used on PX4 and requires 2Hz minimum frequency stream setpoints. For ArduPilot, it requires GUIDED mode instead and doesn't need to stream the setpoints at 2Hz frequency.
   - Add waypoints to missions (Mission mode).
   - Start mission.
   - Works with many commands that uses _MAV_CMD_*_ dialects from MAVLink _common.xml_ as long as they're present in the MavCmd enum from DroneFleet.
 
 - Agent can't:
-  - Set mode with OFFBOARD option - agent succesfully changes to Offboard mode in PX4 but drone wont takeoff/go to specific coordinates with that mode.
   - Commands from MAVLink dialect that don't start with "MAV_CMD_*" need to be tested.
 
-- For this project, mode changes are currently handled via *SET_MODE* for compatibility with tested PX4 modes
 
 - Waypoints are set up via Missions (internal action "_.mission_item_") only using Lat (Degrees), Lon (Degrees) and Alt (Meters) parameters, which by default uses its own standards but the Mavlink4EmbeddedMas class will automatically multiply the Lat and Lon coordinates by multiplier so Agent Programmer only needs to insert normal degrees (eg. 45.273333) instead of a large number. Also the code uploads mission items as *MISSION_ITEM_INT*, where a *Takeoff* is the first item, and the rest are considered _Waypoints_.
 
