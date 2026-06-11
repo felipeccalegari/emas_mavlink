@@ -45,14 +45,14 @@
 /* End of Takeoff and land example. */
 
 /* Takeoff and RTL (Return to Launch) example. */
-/* !demo_takeoff_rtl.
+!demo_takeoff_rtl.
 +!demo_takeoff_rtl <-
     .print("Demo: arm -> takeoff -> RTL.");
     .arming(1);
     .wait(500);
     .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
-    .wait(8000);
-    .rtl. */
+    .wait(15000);
+    .rtl.
 
 /* End of Takeoff and RTL example. */
 
@@ -94,7 +94,7 @@
 /* Common MAVLink perception examples.*/
 
 // Used nanoseconds to avoid perceptions spamming in the terminal and affect simulation behavior.
-/* hb_gap_ns(5000000000).
+hb_gap_ns(5000000000).
 lp_gap_ns(7000000000).
 att_gap_ns(7000000000).
 sys_gap_ns(3000000000).
@@ -104,7 +104,7 @@ last_hb_ns(0).
 last_lp_ns(0).
 last_att_ns(0).
 last_sys_ns(0).
-last_gps_ns(0). */
+last_gps_ns(0).
 
 /* Mavlink HEARTBEAT perception example */
 /* +heartbeat(A,B,C,D,E,F)
@@ -120,7 +120,7 @@ last_gps_ns(0). */
 /* End of Mavlink HEARTBEAT perception example */
 
 /* Mavlink LOCAL_POSITION_NED perception example. */
-/* +localpositionned(X,Y,Zned,Vx,Vy,Vz)
++localpositionned(X,Y,Zned,Vx,Vy,Vz)
   : last_lp_ns(Last) & lp_gap_ns(Gap)
   <-
     .nano_time(Now);
@@ -130,11 +130,11 @@ last_gps_ns(0). */
       Alt = -Zned;
       .print("Local position NED: x=", X, ", y=", Y, ", alt=", Alt,
              ", vx=", Vx, ", vy=", Vy, ", vz=", Vz)
-    }. */
+    }.
 /* End of Mavlink LOCAL_POSITION_NED perception example */
 
 /* Mavlink ATTITUDE perception example. */
-/* +attitude(Roll,Pitch,Yaw,_,_,_,_)
++attitude(Roll,Pitch,Yaw,_,_,_,_)
   : last_att_ns(Last) & att_gap_ns(Gap)
   <-
     .nano_time(Now);
@@ -142,7 +142,7 @@ last_gps_ns(0). */
       -last_att_ns(_);
       +last_att_ns(Now);
       .print("Attitude: roll=", Roll, ", pitch=", Pitch, ", yaw=", Yaw)
-    }. */
+    }.
 /* End of Mavlink ATTITUDE perception example */
 
 /* Mavlink battery perception example.
@@ -178,7 +178,7 @@ VoltageV/CurrentA are -1 when PX4 does not provide them.
 /* End of STATUSTEXT perception example */
 
 /* Mavlink GLOBAL_POSITION_INT perception example. */
-/* +globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
++globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
   : last_gps_ns(Last) & gps_gap_ns(Gap)
   <-
     .nano_time(Now);
@@ -186,7 +186,7 @@ VoltageV/CurrentA are -1 when PX4 does not provide them.
       -last_gps_ns(_);
       +last_gps_ns(Now);
       .print("[GPS] lat=",Lat," lon=",Lon," alt=",Alt," relAlt=",RelAlt)
-    }. */
+    }.
 /* End of GLOBAL_POSITION_INT perception example */
 
 /* MAVLink parameter counter.
@@ -197,98 +197,34 @@ the last published value through PARAM_VALUE.
 /* !demo_param_counter.
 
 +!demo_param_counter <-
-    -counter_step(_);
     -expected_param_value(_);
-    -awaiting_readback(_);
-    +counter_step(0);
     +expected_param_value(1.0);
-    +awaiting_readback(true);
     .print("Starting direct MAVLink parameter counter at 1.");
     .wait(500);
     .param_set("MPC_Z_VEL_MAX_UP", 1.0).
 
-+paramvalue("MPC_Z_VEL_MAX_UP",Value,_,_,_)
-  : expected_param_value(Expected) & counter_step(Step) & awaiting_readback(true)
++paramvalue("MPC_Z_VEL_MAX_UP", Value, _, _, _)
+  : expected_param_value(Expected)
   <-
     if (Value == Expected) {
-      -awaiting_readback(_);
       .nano_time(Timestamp);
-      .print(Timestamp, ";", Step, ";", Value);
-      if (Step < 100) {
-        NextStep = Step + 1;
+      .print(Timestamp, ";", Value);
+
+      if (Expected < 100.0) {
         NextValue = Expected + 1.0;
-        -counter_step(_);
-        +counter_step(NextStep);
         -expected_param_value(_);
         +expected_param_value(NextValue);
-        +awaiting_readback(true);
         .param_set("MPC_Z_VEL_MAX_UP", NextValue);
         .wait(120)
       } else {
         .print("MAVLink parameter counter finished at value ", Value, ".");
-        -counter_step(_);
         -expected_param_value(_)
       }
     }. */
 /* End of MAVLink parameter counter. */
 
-/* Offboard mode example. */
-/* !demo_offboard.
-+!demo_offboard <-
-    .print("Demo: keep publishing local setpoints -> OFFBOARD -> arm -> move to x=5.0, y=0.0, z=-3.0.");
-    !!offboard_stream;
-    .wait(1200);
-    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main mode, no submode
-    .wait(500);
-    .arming(1).
-
-+!offboard_stream
-  <-
-    // First parameter is kept as a placeholder so the remaining values match the current sp_local bridge parser.
-    // Frame 1 = MAV_FRAME_LOCAL_NED. Type mask 3576 = use position only (ignore velocity, acceleration and yaw fields).
-    .sp_local(0, 1, 1, 1, 3576, 5.0, 0.0, -3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    .wait(100);
-    !offboard_stream. */
-/* End of Offboard mode example. */
-
-/* Offboard BODY_NED velocity example. */
-/* !demo_offboard_body.
-+!demo_offboard_body <-
-    .print("Demo: OFFBOARD with body-frame velocity steps (forward/right/up relative to current heading).");
-    -body_velocity(_,_,_);
-    +body_velocity(0.0, 0.0, -0.5);
-    !!offboard_body_stream;
-    .wait(1200);
-    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main mode, no submode
-    .wait(500);
-    .arming(1);
-    .wait(4000);
-    -body_velocity(_,_,_);
-    +body_velocity(0.8, 0.0, 0.0); // fly forward
-    .wait(3000);
-    -body_velocity(_,_,_);
-    +body_velocity(0.0, 0.6, 0.0); // fly right
-    .wait(3000);
-    -body_velocity(_,_,_);
-    +body_velocity(0.8, 0.0, 0.0); // fly forward again
-    .wait(3000);
-    -body_velocity(_,_,_);
-    +body_velocity(0.0, 0.0, 0.0). // stop and hold
-
-+!offboard_body_stream
-  : body_velocity(Vx, Vy, Vz)
-  <-
-    // First parameter is kept as a placeholder so the remaining values match the current sp_local bridge parser.
-    // Frame 8 = MAV_FRAME_BODY_NED, which PX4 supports for velocity setpoints.
-    // Vx = forward, Vy = right, Vz = down in the vehicle body frame.
-    // Type mask 3527 = ignore position, acceleration, yaw and yaw rate; use only body-frame velocity.
-    .sp_local(0, 1, 1, 8, 3527, 0.0, 0.0, 0.0, Vx, Vy, Vz, 0.0, 0.0, 0.0, 0.0, 0.0);
-    .wait(100);
-    !offboard_body_stream. */
-/* End of Offboard BODY_NED velocity example. */
-
-/* Body-relative position example. */
-!demo_offboard_body_relative_position.
+/* "High-level" Offboard example for PX4. */
+/* !demo_offboard_body_relative_position.
 +!demo_offboard_body_relative_position
   : not nav_pose_local(_,_,_,_)
   <-
@@ -299,14 +235,14 @@ the last published value through PARAM_VALUE.
 +!demo_offboard_body_relative_position
   : nav_pose_local(_,_,_,_)
   <-
-    .print("Demo: body-relative position offsets using high-level sp_local(Forward, Right, Up).");
+    .print("Demo: Offboard mode using high-level setpoint local with (Forward, Right, Up).");
     -offboard_body_relative_stream_enabled;
     +offboard_body_relative_stream_enabled;
     -body_relative_target(_,_,_);
     +body_relative_target(0.0, 0.0, 2.0); // take off 2 m relative to the current pose
-    !offboard_body_relative_position_stream;
+    !!offboard_body_relative_position_stream;
     .wait(1200);
-    .set_mode(1, 6, 0); // MAV_CMD_DO_SET_MODE: custom enabled, PX4 OFFBOARD main custom mode, no submode
+    .set_mode(1, 6, 0); // (custom enabled, PX4 OFFBOARD main custom mode, no submode)
     .wait(500);
     .arming(1);
     .wait(5000);
@@ -341,5 +277,6 @@ the last published value through PARAM_VALUE.
 +!offboard_body_relative_position_stream
   : not offboard_body_relative_stream_enabled
   <-
-    true.
-/* End of Body-relative position example. */
+    true. */
+/* End of Offboard "High-level" position example for PX4. */
+

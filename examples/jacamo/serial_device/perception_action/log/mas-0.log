@@ -1,0 +1,13 @@
+[sample_agent] Demo: arm -> takeoff -> RTL.
+[sample_agent] [GPS] lat=473979713 lon=85461636 alt=241 relAlt=83
+[sample_agent] Attitude: roll=278392, pitch=9.1466715E-4, yaw=-0.005841711
+[sample_agent] [GPS] lat=473979722 lon=85461630 alt=2557 relAlt=2298
+[sample_agent] Attitude: roll=286192, pitch=0.007878347, yaw=-0.004348556
+[sample_agent] [GPS] lat=473979721 lon=85461634 alt=3999 relAlt=3740
+[sample_agent] Attitude: roll=293096, pitch=0.006788943, yaw=-0.012195058
+[sample_agent] [GPS] lat=473979714 lon=85461642 alt=185 relAlt=-73
+[sample_agent] Attitude: roll=300196, pitch=9.017646E-4, yaw=-0.00490297
+[sample_agent] [GPS] lat=473979712 lon=85461643 alt=313 relAlt=53
+[sample_agent] Attitude: roll=307292, pitch=0.0014770919, yaw=-0.005962969
+[sample_agent] [GPS] lat=473979712 lon=85461643 alt=221 relAlt=-38
+[sample_agent] Attitude: roll=314396, pitch=0.0012798215, yaw=-0.006122702
