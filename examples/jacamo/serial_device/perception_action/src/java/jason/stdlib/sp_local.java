@@ -15,9 +15,8 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
         private static final int TARGET_COMPONENT = 1;
         private static final int MAV_FRAME_LOCAL_NED = 1;
         private static final int POSITION_ONLY_TYPE_MASK = 3576;
-        private static final double YAW_RESET_GROUND_ZNED = -0.5;
 
-        private Double frozenYaw;
+        private static Double referenceYaw;
 
         @Override
         public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -57,12 +56,10 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
         private RelativeSetpoint relativeSetpoint(TransitionSystem ts, double forward, double right, double up)
                 throws Exception {
             LocalPose pose = currentLocalPose(ts);
-            if (frozenYaw == null || pose.zned > YAW_RESET_GROUND_ZNED) {
-                frozenYaw = pose.yaw;
-            }
+            double yaw = captureOrReuseReferenceYaw(pose);
 
-            double deltaX = (forward * Math.cos(frozenYaw)) - (right * Math.sin(frozenYaw));
-            double deltaY = (forward * Math.sin(frozenYaw)) + (right * Math.cos(frozenYaw));
+            double deltaX = (forward * Math.cos(yaw)) - (right * Math.sin(yaw));
+            double deltaY = (forward * Math.sin(yaw)) + (right * Math.cos(yaw));
             double deltaZned = -up;
 
             return new RelativeSetpoint(
@@ -72,6 +69,17 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
                 pose.x + deltaX,
                 pose.y + deltaY,
                 pose.zned + deltaZned);
+        }
+
+        public static synchronized void resetReferenceYaw() {
+            referenceYaw = null;
+        }
+
+        private static synchronized double captureOrReuseReferenceYaw(LocalPose pose) {
+            if (referenceYaw == null) {
+                referenceYaw = pose.yaw;
+            }
+            return referenceYaw;
         }
 
         private static double numberArg(Term arg, String name) throws Exception {

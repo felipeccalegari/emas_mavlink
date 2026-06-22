@@ -177,6 +177,10 @@ last_gps_ns(0).
     .print("Taking off to 2m and waiting for altitude to stabilize...");
     .wait(20000);
 
+    .reset_sp_local_reference;
+    .print("Locked sp_local reference yaw after takeoff.");
+    .wait(3000);
+
     .print("Command: move 2m forward.");
     .sp_local(2.0, 0.0, 0.0); // 2 m forward
     .wait(10000);
