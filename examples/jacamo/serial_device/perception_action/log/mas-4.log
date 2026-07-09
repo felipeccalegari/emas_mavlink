@@ -1,3 +1,0 @@
-[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
-[ardupilot] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_ARDUPILOTMEGA, base_mode=81, custom_mode=0, system_status=MAV_STATE_STANDBY, mavlink_version=3
-[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19

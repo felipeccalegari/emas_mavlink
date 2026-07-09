@@ -1,3 +1,0 @@
-[ardupilot] Starting MAVLink ACK-driven camera capture demo with 20 iterations.
-[ardupilot] Example 4 ACK not accepted: command=511, result=0, stamp=12137373019778, sys=1, comp=1, stopping at iteration 1.
-[ardupilot] Example 4 ACK not accepted: command=511, result=0, stamp=12137402776462, sys=1, comp=1, stopping at iteration 1.
