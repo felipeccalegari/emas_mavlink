@@ -1,0 +1,50 @@
+[ardupilot] Requested LOCAL_POSITION_NED stream; waiting for localpositionned telemetry...
+[ardupilot] ArduPilot GUIDED - using body-offset setpoint_local(Forward, Right, Up).
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
+[ardupilot] Taking off to 2m and waiting for altitude to stabilize...
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0.009078042 z_ned=-0.86 alt=0.86
+[ardupilot] Locked setpoint_local reference yaw after takeoff.
+[ardupilot] [LOCAL_POSITION_NED] x=0 y=0 z_ned=-2.25 alt=2.25
+[ardupilot] Command: move 2 m forward.
+[ardupilot] [LOCAL_POSITION_NED] x=1.4248812 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=1.8812885 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] Command: move 2 m backward to return.
+[ardupilot] [LOCAL_POSITION_NED] x=2.0148711 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=0.4230116 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=0.07792319 y=0 z_ned=-2.23 alt=2.23
+[ardupilot] Command: move 2 m right.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.05565942 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=2.0970275 z_ned=-2.25 alt=2.25
+[ardupilot] [LOCAL_POSITION_NED] x=-0.0111318845 y=1.8791546 z_ned=-2.24 alt=2.24
+[ardupilot] Command: move 2 m left to return.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=2.0244033 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=-0.045390207 z_ned=-2.25 alt=2.25
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=0.11801454 z_ned=-2.24 alt=2.24
+[ardupilot] Command: move 2 m left.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=-1.525111 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=-1.8609985 z_ned=-2.23 alt=2.23
+[ardupilot] Command: move 2 m right to return.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=-2.0153253 z_ned=-2.23 alt=2.23
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=0.081702374 z_ned=-2.25 alt=2.25
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=-0.13617063 z_ned=-2.23 alt=2.23
+[ardupilot] Command: move 2 m backward.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.022263769 y=0 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-1.5584638 y=0.009078041 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-1.9035523 y=-0.018156081 z_ned=-2.23 alt=2.23
+[ardupilot] Command: move 2 m forward to return.
+[ardupilot] [LOCAL_POSITION_NED] x=-2.0482666 y=-0.018156081 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.55659425 y=-0.018156083 z_ned=-2.24 alt=2.24
+[ardupilot] [LOCAL_POSITION_NED] x=-0.1447145 y=-0.018156083 z_ned=-2.23 alt=2.23
+[ardupilot] [LOCAL_POSITION_NED] x=-0.0111318845 y=-0.018156083 z_ned=-2.24 alt=2.24
+[ardupilot] Landing and finishing GUIDED high-level LAND demo.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.0111318845 y=-0.018156083 z_ned=-1.67 alt=1.67
+[ardupilot] [LOCAL_POSITION_NED] x=-0.044527538 y=-0.018156083 z_ned=-0.66 alt=0.66
+[ardupilot] [LOCAL_POSITION_NED] x=-0.044527538 y=-0.018156083 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=-0.044527538 y=-0.018156083 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=-0.044527538 y=-0.018156083 z_ned=-0.19 alt=0.19
+[ardupilot] [LOCAL_POSITION_NED] x=-0.044527538 y=-0.018156083 z_ned=-0.19 alt=0.19

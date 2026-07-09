@@ -1,0 +1,15 @@
+[sample_agent] Waiting for nav pose...
+[sample_agent] Demo: Offboard mode using high-level setpoint local with (Forward, Right, Up).
+[sample_agent] [battery] Battery getting low: raw=70% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=67% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=64% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=60% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=57% voltage=-1V current=-1A
+[sample_agent] Returning to launch and finishing flight.
+[sample_agent] [battery] Battery getting low: raw=54% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=51% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=50% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=50% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=50% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=50% voltage=-1V current=-1A
+[sample_agent] [battery] Battery getting low: raw=51% voltage=15.3V current=-1A

@@ -30,6 +30,7 @@ public abstract class DefaultDevice implements IDevice {
 
 	protected Atom id;
 	protected IExternalInterface microcontroller;
+	private Runnable perceptListener;
 	private HashMap<Atom, EmbeddedAction> embeddedActions = new HashMap<Atom, EmbeddedAction>();
 	private HashSet<Actuator> actuators = new HashSet<Actuator>();
 
@@ -52,6 +53,16 @@ public abstract class DefaultDevice implements IDevice {
 	}
 
 	public abstract IExternalInterface getMicrocontroller();
+
+	public void setPerceptListener(Runnable perceptListener) {
+		this.perceptListener = perceptListener;
+	}
+
+	protected void notifyPerceptAvailable() {
+		if (perceptListener != null) {
+			perceptListener.run();
+		}
+	}
 
 	
 	@Deprecated

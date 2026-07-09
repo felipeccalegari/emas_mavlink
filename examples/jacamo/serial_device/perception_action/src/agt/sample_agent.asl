@@ -26,7 +26,9 @@
             -+awaiting_z(Next);
             .reposition(-1, 1, 0, 0, 47.3979710, 8.5461637, Next);
         } else {
-            .print("Reposition Z counter finished.");
+            .print("Reposition Z counter finished, landing now.");
+            .wait(200);
+            .land(0, 0, 0, 0, 47.3979710, 8.5461637, 0.0);
         };
     };
     -step_transitioning(_). */
@@ -45,14 +47,14 @@
 /* End of Takeoff and land example. */
 
 /* Takeoff and RTL (Return to Launch) example. */
-!demo_takeoff_rtl.
+/* !demo_takeoff_rtl.
 +!demo_takeoff_rtl <-
     .print("Demo: arm -> takeoff -> RTL.");
     .arming(1);
     .wait(500);
     .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 4.0);
     .wait(15000);
-    .rtl.
+    .rtl. */
 
 /* End of Takeoff and RTL example. */
 
@@ -74,8 +76,8 @@
 /* End of Reposition and Land example */
 
 /* Mission mode and mission start example. */
-
-/* !demo_mission.
+/* 
+!demo_mission.
 +!demo_mission <-
     .print("Demo: upload a short mission and start AUTO mission.");
     .mission_clear;
@@ -94,7 +96,7 @@
 /* Common MAVLink perception examples.*/
 
 // Used nanoseconds to avoid perceptions spamming in the terminal and affect simulation behavior.
-hb_gap_ns(5000000000).
+/* hb_gap_ns(5000000000).
 lp_gap_ns(7000000000).
 att_gap_ns(7000000000).
 sys_gap_ns(3000000000).
@@ -104,7 +106,7 @@ last_hb_ns(0).
 last_lp_ns(0).
 last_att_ns(0).
 last_sys_ns(0).
-last_gps_ns(0).
+last_gps_ns(0). */
 
 /* Mavlink HEARTBEAT perception example */
 /* +heartbeat(A,B,C,D,E,F)
@@ -119,22 +121,8 @@ last_gps_ns(0).
     }. */
 /* End of Mavlink HEARTBEAT perception example */
 
-/* Mavlink LOCAL_POSITION_NED perception example. */
-+localpositionned(X,Y,Zned,Vx,Vy,Vz)
-  : last_lp_ns(Last) & lp_gap_ns(Gap)
-  <-
-    .nano_time(Now);
-    if (Now - Last >= Gap) {
-      -last_lp_ns(_);
-      +last_lp_ns(Now);
-      Alt = -Zned;
-      .print("Local position NED: x=", X, ", y=", Y, ", alt=", Alt,
-             ", vx=", Vx, ", vy=", Vy, ", vz=", Vz)
-    }.
-/* End of Mavlink LOCAL_POSITION_NED perception example */
-
 /* Mavlink ATTITUDE perception example. */
-+attitude(Roll,Pitch,Yaw,_,_,_,_)
+/* +attitude(Roll,Pitch,Yaw,_,_,_,_)
   : last_att_ns(Last) & att_gap_ns(Gap)
   <-
     .nano_time(Now);
@@ -142,7 +130,7 @@ last_gps_ns(0).
       -last_att_ns(_);
       +last_att_ns(Now);
       .print("Attitude: roll=", Roll, ", pitch=", Pitch, ", yaw=", Yaw)
-    }.
+    }. */
 /* End of Mavlink ATTITUDE perception example */
 
 /* Mavlink battery perception example.
@@ -151,11 +139,21 @@ PNorm is normalized to [0.0, 1.0] so it matches MAVROS-style threshold checks mo
 PRaw is the MAVLink battery_remaining field in [0,100].
 VoltageV/CurrentA are -1 when PX4 does not provide them.
 */
-/* +battery(PNorm,PRaw,VoltageV,CurrentA)
+battery_low_threshold_raw(70).
+battery_print_gap_ns(2000000000).
+last_battery_print_ns(0).
+
++battery(_,PRaw,VoltageV,CurrentA)
+  : battery_low_threshold_raw(Threshold) &
+    battery_print_gap_ns(Gap) &
+    last_battery_print_ns(Last)
   <-
-    if (PNorm >= 0 & PNorm < 0.55) {
-      .print("Battery getting low: raw=", PRaw, "% voltage=", VoltageV, "V current=", CurrentA, "A")
-    }. */
+    .nano_time(Now);
+    if (PRaw >= 0 & PRaw <= Threshold & Now - Last >= Gap) {
+      -last_battery_print_ns(_);
+      +last_battery_print_ns(Now);
+      .print("[battery] Battery getting low: raw=", PRaw, "% voltage=", VoltageV, "V current=", CurrentA, "A")
+    }.
 /* End of Mavlink battery perception example */
 
 /* Mavlink SYS_STATUS perception example. */
@@ -166,7 +164,7 @@ VoltageV/CurrentA are -1 when PX4 does not provide them.
     if (Now - Last >= Gap) {
       -last_sys_ns(_);
       +last_sys_ns(Now);
-      .print("Battery remaining: ", BatteryRemaining)
+      .print("[SYS_STATUS] Battery remaining: ", BatteryRemaining)
     }. */
 /* End of Mavlink SYS_STATUS perception example */
 
@@ -178,7 +176,7 @@ VoltageV/CurrentA are -1 when PX4 does not provide them.
 /* End of STATUSTEXT perception example */
 
 /* Mavlink GLOBAL_POSITION_INT perception example. */
-+globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
+/* +globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
   : last_gps_ns(Last) & gps_gap_ns(Gap)
   <-
     .nano_time(Now);
@@ -186,7 +184,7 @@ VoltageV/CurrentA are -1 when PX4 does not provide them.
       -last_gps_ns(_);
       +last_gps_ns(Now);
       .print("[GPS] lat=",Lat," lon=",Lon," alt=",Alt," relAlt=",RelAlt)
-    }.
+    }. */
 /* End of GLOBAL_POSITION_INT perception example */
 
 /* MAVLink parameter counter.
@@ -224,7 +222,7 @@ the last published value through PARAM_VALUE.
 /* End of MAVLink parameter counter. */
 
 /* "High-level" Offboard example for PX4. */
-/* !demo_offboard_body_relative_position.
+!demo_offboard_body_relative_position.
 +!demo_offboard_body_relative_position
   : not nav_pose_local(_,_,_,_)
   <-
@@ -275,8 +273,34 @@ the last published value through PARAM_VALUE.
     !offboard_body_relative_position_stream.
 
 +!offboard_body_relative_position_stream
+  : offboard_body_relative_stream_enabled & not body_relative_target(_,_,_)
+  <-
+    .wait(50);
+    !offboard_body_relative_position_stream.
+
++!offboard_body_relative_position_stream
   : not offboard_body_relative_stream_enabled
   <-
-    true. */
+    true.
 /* End of Offboard "High-level" position example for PX4. */
 
+/*Beginning of Camera example - PX4 */
+
+/* !demo_camera_capture.
++!demo_camera_capture <-
+    .print("Demo: arm -> takeoff -> capture image -> capture image -> land.");
+    .arming(1);
+    .wait(500);
+    .print("Taking off to 3m altitude...");
+    .takeoff(0, 0, 0, 0, 47.3979710, 8.5461637, 3.0);
+    .wait(10000);
+    .print("Capturing first image.");
+    .camera_capture(0, 0, 0, 0, 1, 0, 0); // MAV_CMD_DO_DIGICAM_CONTROL: param5=1 triggers one shot
+    .wait(5000);
+    .print("Capturing second image.");
+    .camera_capture(0, 0, 0, 0, 1, 0, 0); // second one-shot trigger
+    .wait(3000);
+    .print("Landing...");
+    .land(0, 0, 0, 0, 47.3979710, 8.5461637, 0.0). */
+
+/* End of camera example - PX4 */

@@ -1,0 +1,22 @@
+[ardupilot] Starting MAVLink ACK-driven camera capture demo with 20 iterations.
+[ardupilot] Example 4 ACK accepted at stamp=12795585198234 from sys=1 comp=1 for iteration 1 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795651340347 from sys=1 comp=1 for iteration 2 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795715577168 from sys=1 comp=1 for iteration 3 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795767876453 from sys=1 comp=1 for iteration 4 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795833360513 from sys=1 comp=1 for iteration 5 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795892150257 from sys=1 comp=1 for iteration 6 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795947499019 from sys=1 comp=1 for iteration 7 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795968697937 from sys=1 comp=1 for iteration 8 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12795983971680 from sys=1 comp=1 for iteration 9 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796021900022 from sys=1 comp=1 for iteration 10 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796090068949 from sys=1 comp=1 for iteration 11 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796148406069 from sys=1 comp=1 for iteration 12 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796192808418 from sys=1 comp=1 for iteration 13 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796273757555 from sys=1 comp=1 for iteration 14 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796324833187 from sys=1 comp=1 for iteration 15 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796363978513 from sys=1 comp=1 for iteration 16 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796392682387 from sys=1 comp=1 for iteration 17 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796433662794 from sys=1 comp=1 for iteration 18 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796486194959 from sys=1 comp=1 for iteration 19 of 20.
+[ardupilot] Example 4 ACK accepted at stamp=12796551703517 from sys=1 comp=1 for iteration 20 of 20.
+[ardupilot] Example 4 finished at stamp=12796551703517

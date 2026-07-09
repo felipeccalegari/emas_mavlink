@@ -32,6 +32,7 @@ import gnu.io.UnsupportedCommOperationException;
 import io.dronefleet.mavlink.MavlinkConnection;
 import io.dronefleet.mavlink.MavlinkMessage;
 import io.dronefleet.mavlink.common.Attitude;
+import io.dronefleet.mavlink.common.CommandAck;
 import io.dronefleet.mavlink.common.CommandInt;
 import io.dronefleet.mavlink.common.CommandLong;
 import io.dronefleet.mavlink.common.GlobalPositionInt;
@@ -53,6 +54,7 @@ import io.dronefleet.mavlink.common.MissionRequestInt;
 import io.dronefleet.mavlink.common.MissionSetCurrent;
 import io.dronefleet.mavlink.common.ParamRequestRead;
 import io.dronefleet.mavlink.common.ParamSet;
+import io.dronefleet.mavlink.common.RequestDataStream;
 import io.dronefleet.mavlink.common.SetPositionTargetLocalNed;
 import io.dronefleet.mavlink.common.Timesync;
 import io.dronefleet.mavlink.minimal.MavAutopilot;
@@ -90,6 +92,8 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
     private GlobalPose latestGlobalPose;
     private LocalOrigin latestLocalOrigin;
     private Double latestYawRad;
+    private Double setpointReferenceYawRad;
+    private long lastLocalTelemetryRequestMs = 0L;
 
     private static class MissionWp {
         final double latDeg;
@@ -244,6 +248,8 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                 cacheLatestTelemetry(navPoseJson);
             }
 
+            requestLocalTelemetryUntilReceived();
+
             String mav = readMavlinkTelemetryNonBlocking();
             if (mav != null && !mav.isEmpty()) return mav;
 
@@ -265,6 +271,7 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         latestGlobalPose = null;
         latestLocalOrigin = null;
         latestYawRad = null;
+        setpointReferenceYawRad = null;
         missionBuffer = new ArrayList<>();
 
         try { ensureMavlinkTx(); } catch (Exception ignored) {}
@@ -361,7 +368,12 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                         continue;
                     }
 
-                    String json = mavPayloadToJson(payload);
+                    String commandAckJson = mavPayloadToCommandAckJson(msg);
+                    if (commandAckJson != null && !commandAckJson.isEmpty()) {
+                        cacheLatestTelemetry(commandAckJson);
+                    }
+
+                    String json = (payload instanceof CommandAck) ? "" : mavPayloadToJson(payload);
                     if (json != null && !json.isEmpty()) {
                         cacheLatestTelemetry(json);
                     }
@@ -433,9 +445,11 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         if (telemetryRequestsSent) return;
 
         try {
-            requestMessageInterval(MAVLINK_MSG_ID_ATTITUDE, 10);
-            requestMessageInterval(MAVLINK_MSG_ID_LOCAL_POSITION_NED, 10);
-            requestMessageInterval(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, 10);
+            // Keep default telemetry lightweight so COMMAND_ACK and other event-style
+            // messages are not delayed behind a heavy telemetry stream.
+            requestMessageInterval(MAVLINK_MSG_ID_ATTITUDE, 2);
+            requestMessageInterval(MAVLINK_MSG_ID_LOCAL_POSITION_NED, 2);
+            requestMessageInterval(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, 2);
             requestMessageInterval(MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN, 1);
             requestMessageInterval(MAVLINK_MSG_ID_SYS_STATUS, 2);
             requestMessageInterval(MAVLINK_MSG_ID_BATTERY_STATUS, 2);
@@ -443,6 +457,22 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
             telemetryRequestsSent = true;
         } catch (Exception e) {
             System.err.println("[NRJ] MAVLink telemetry request failed, will retry on next init.");
+        }
+    }
+
+    private void requestLocalTelemetryUntilReceived() {
+        if (latestLocalPose != null) return;
+
+        long now = System.currentTimeMillis();
+        if ((now - lastLocalTelemetryRequestMs) < 2000L) return;
+        lastLocalTelemetryRequestMs = now;
+
+        try {
+            requestMessageInterval(MAVLINK_MSG_ID_LOCAL_POSITION_NED, 10);
+            requestMessageInterval(MAVLINK_MSG_ID_ATTITUDE, 10);
+            requestDataStream(6, 10, true);
+        } catch (Exception e) {
+            System.err.println("[NRJ] Local position telemetry request retry failed.");
         }
     }
 
@@ -458,6 +488,63 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                 .param1((float) messageId)
                 .param2((float) intervalUs)
                 .param3(0f).param4(0f).param5(0f).param6(0f).param7(0f)
+                .build();
+        sendMavlink(msg);
+    }
+
+    private void requestDataStream(int streamId, int rateHz, boolean start) throws IOException {
+        RequestDataStream msg = RequestDataStream.builder()
+                .targetSystem(targetSystem)
+                .targetComponent(targetComponent)
+                .reqStreamId(streamId)
+                .reqMessageRate(rateHz)
+                .startStop(start ? 1 : 0)
+                .build();
+        sendMavlink(msg);
+    }
+
+    private void resetSetpointLocalReference() {
+        setpointReferenceYawRad = null;
+    }
+
+    private void sendSetpointLocalBodyOffset(double forward, double right, double up) throws Exception {
+        LocalPose pose = latestLocalPose;
+        Double yaw = latestYawRad;
+
+        if (pose == null) {
+            requestLocalTelemetryUntilReceived();
+            throw new Exception("SETPOINT_LOCAL requires LOCAL_POSITION_NED telemetry");
+        }
+        if (yaw == null) {
+            requestLocalTelemetryUntilReceived();
+            throw new Exception("SETPOINT_LOCAL requires ATTITUDE telemetry");
+        }
+
+        if (setpointReferenceYawRad == null) {
+            setpointReferenceYawRad = yaw;
+        }
+
+        double refYaw = setpointReferenceYawRad.doubleValue();
+        double deltaNorth = (forward * Math.cos(refYaw)) - (right * Math.sin(refYaw));
+        double deltaEast = (forward * Math.sin(refYaw)) + (right * Math.cos(refYaw));
+
+        SetPositionTargetLocalNed msg = SetPositionTargetLocalNed.builder()
+                .timeBootMs((long) (System.nanoTime() / 1_000_000L))
+                .targetSystem((short) targetSystem)
+                .targetComponent((short) targetComponent)
+                .coordinateFrame(EnumValue.of(MavFrame.MAV_FRAME_LOCAL_NED))
+                .typeMask(EnumValue.create(2552))
+                .x((float) (pose.x + deltaNorth))
+                .y((float) (pose.y + deltaEast))
+                .z((float) (pose.zned - up))
+                .vx(0f)
+                .vy(0f)
+                .vz(0f)
+                .afx(0f)
+                .afy(0f)
+                .afz(0f)
+                .yaw((float) refYaw)
+                .yawRate(0f)
                 .build();
         sendMavlink(msg);
     }
@@ -568,6 +655,9 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
 
         long now = System.currentTimeMillis();
         boolean throttleEnabled = !"paramvalue".equals(key) && !"nav_pose_local".equals(key);
+        if ("command_ack".equals(key)) {
+            throttleEnabled = false;
+        }
         if (throttleEnabled) {
             Long last = telemetryEmitMs.get(key);
             long minGapMs = 100L;
@@ -623,6 +713,31 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private String mavPayloadToCommandAckJson(MavlinkMessage<?> msg) {
+        if (!(msg.getPayload() instanceof CommandAck)) {
+            return "";
+        }
+
+        CommandAck ack = (CommandAck) msg.getPayload();
+        long stamp = System.nanoTime();
+        int command = enumNumeric(ack.command());
+        int result = enumNumeric(ack.result());
+        return "{\"command_ack\":["
+                + command + ","
+                + result + ","
+                + stamp + ","
+                + msg.getOriginSystemId() + ","
+                + msg.getOriginComponentId()
+                + "]}";
+    }
+
+    private int enumNumeric(EnumValue<?> value) {
+        if (value == null) {
+            return -1;
+        }
+        return value.value();
     }
 
     private String mavPayloadToBatteryJson(Object payload) {
@@ -1343,6 +1458,27 @@ public class Mavlink4EmbeddedMas extends NRJ4EmbeddedMas {
                     .yawRate(toFloat(params[15]))
                     .build();
             sendMavlink(msg);
+            return;
+        }
+
+        if ("SETPOINT_LOCAL".equals(name)) {
+            if (params.length < 3) {
+                throw new Exception("SETPOINT_LOCAL requires (forward, right, up)");
+            }
+            sendSetpointLocalBodyOffset(toFloat(params[0]), toFloat(params[1]), toFloat(params[2]));
+            return;
+        }
+
+        if ("RESET_SETPOINT_LOCAL_REFERENCE".equals(name)) {
+            resetSetpointLocalReference();
+            return;
+        }
+
+        if ("REQUEST_DATA_STREAM".equals(name)) {
+            if (params.length < 3) {
+                throw new Exception("REQUEST_DATA_STREAM requires (streamId, rateHz, startStop)");
+            }
+            requestDataStream(toInt(params[0]), toInt(params[1]), toInt(params[2]) != 0);
             return;
         }
 

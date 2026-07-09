@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 version = '0.061-SNAPSHOT'
@@ -108,4 +109,14 @@ jar {
     }
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'embedded-mas'
+            artifactId = 'embedded-mas'
+            version = '0.061-SNAPSHOT'
+        }
+    }
+}
 

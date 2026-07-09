@@ -90,6 +90,9 @@ public abstract class EmbeddedAgent extends Agent {
 				}
 			}
 			arch.setDevices(devices);
+			for (DefaultDevice device : devices) {
+				device.setPerceptListener(() -> arch.getTS().getAgArch().wakeUpSense());
+			}
 			return;
 		}
 	}

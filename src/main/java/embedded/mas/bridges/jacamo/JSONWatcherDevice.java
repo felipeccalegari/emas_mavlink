@@ -49,6 +49,7 @@ public class JSONWatcherDevice extends SerialDevice implements IDevice {
 				}
 			}
 		}
+		notifyPerceptAvailable();
 	}
 
 	@Override

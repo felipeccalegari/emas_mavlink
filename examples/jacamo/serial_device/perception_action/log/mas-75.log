@@ -1,0 +1,5 @@
+[ardupilot] Time1: 2069164238343
+[ardupilot] Requested LOCAL_POSITION_NED and ATTITUDE streams.
+[ardupilot] [LOCAL_POSITION_NED] x=-0.004902999 y=0.007261643 z_ned=0.042674556 alt=-0.042674556
+[ardupilot] ArduPilot GUIDED - using body-offset setpoint_local(Forward, Right, Up).
+[ardupilot] [LOCAL_POSITION_NED] x=0.016097486 y=-0.007818538 z_ned=0.07033464 alt=-0.07033464

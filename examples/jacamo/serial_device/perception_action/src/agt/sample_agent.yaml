@@ -42,3 +42,5 @@
         actuationName: PARAM_SET
       - actionName: param_request_read
         actuationName: PARAM_REQUEST_READ
+      - actionName: camera_capture
+        actuationName: MAV_CMD_DO_DIGICAM_CONTROL

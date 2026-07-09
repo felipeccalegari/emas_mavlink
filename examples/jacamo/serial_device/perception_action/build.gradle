@@ -10,6 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_21
 targetCompatibility = JavaVersion.VERSION_21
 
 repositories {
+    mavenLocal()
     maven { url "https://raw.github.com/jacamo-lang/mvn-repo/master" }
     maven { url "https://repo.gradle.org/gradle/libs-releases-local" }
     maven { url "https://raw.github.com/embedded-mas/embedded-mas-mvn-repo/master" }

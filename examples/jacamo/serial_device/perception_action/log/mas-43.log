@@ -1,0 +1,8 @@
+[ardupilot] Starting MAVLink flight + ACK-driven camera capture demo.
+[ardupilot] Takeoff command sent to 3m.
+[CAgentArch] error trying action with cartago Artifact not found.
+[CAgentArch] Action failed: camera_capture_takeoff_wait_ms(TakeoffWaitMs), in namespace default, operation ( camera_capture_takeoff_wait_ms cartago.OpFeedbackParam@9284eb9 )
+[ardupilot] No failure event was generated for +!demo_camera_capture_flight[code(camera_capture_takeoff_wait_ms(_23)),code_line(291),code_src("file:src/agt/ardupilot.asl"),env_failure_reason(env_failure(action_failed(camera_capture_takeoff_wait_ms,op(default,"( camera_capture_takeoff_wait_ms cartago.OpFeedbackParam@9284eb9 )")))),error(action_failed),error_msg("Action failed: camera_capture_takeoff_wait_ms(TakeoffWaitMs), in namespace default, operation ( camera_capture_takeoff_wait_ms cartago.OpFeedbackParam@9284eb9 )"),source(self)]
+intention 1: 
+    +!demo_camera_capture_flight[source(self)] <- ... camera_capture_takeoff_wait_ms(TakeoffWaitMs); .wait(TakeoffWaitMs); -pending_camera_capture_flight_iteration(_1); +pending_camera_capture_flight_iteration(1); .print("Beginning 20 ACK-driven captures."); .camera_capture(0,0,1,1,0,0,0) / {}
+

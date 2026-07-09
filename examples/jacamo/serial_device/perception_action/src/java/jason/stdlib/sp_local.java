@@ -17,6 +17,10 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
         private static final int POSITION_ONLY_TYPE_MASK = 3576;
 
         private static Double referenceYaw;
+        private static LocalPose referencePose;
+        private static Double lastForward;
+        private static Double lastRight;
+        private static Double lastUp;
 
         @Override
         public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
@@ -56,7 +60,8 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
         private RelativeSetpoint relativeSetpoint(TransitionSystem ts, double forward, double right, double up)
                 throws Exception {
             LocalPose pose = currentLocalPose(ts);
-            double yaw = captureOrReuseReferenceYaw(pose);
+            ReferenceFrame reference = captureOrReuseReference(pose, forward, right, up);
+            double yaw = reference.yaw;
 
             double deltaX = (forward * Math.cos(yaw)) - (right * Math.sin(yaw));
             double deltaY = (forward * Math.sin(yaw)) + (right * Math.cos(yaw));
@@ -66,20 +71,35 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
                 forward,
                 right,
                 up,
-                pose.x + deltaX,
-                pose.y + deltaY,
-                pose.zned + deltaZned);
+                reference.pose.x + deltaX,
+                reference.pose.y + deltaY,
+                reference.pose.zned + deltaZned);
         }
 
         public static synchronized void resetReferenceYaw() {
             referenceYaw = null;
+            referencePose = null;
+            lastForward = null;
+            lastRight = null;
+            lastUp = null;
         }
 
-        private static synchronized double captureOrReuseReferenceYaw(LocalPose pose) {
-            if (referenceYaw == null) {
+        private static synchronized ReferenceFrame captureOrReuseReference(LocalPose pose, double forward, double right, double up) {
+            if (referenceYaw == null
+                    || referencePose == null
+                    || lastForward == null
+                    || lastRight == null
+                    || lastUp == null
+                    || Double.compare(lastForward, forward) != 0
+                    || Double.compare(lastRight, right) != 0
+                    || Double.compare(lastUp, up) != 0) {
                 referenceYaw = pose.yaw;
+                referencePose = pose;
+                lastForward = forward;
+                lastRight = right;
+                lastUp = up;
             }
-            return referenceYaw;
+            return new ReferenceFrame(referencePose, referenceYaw.doubleValue());
         }
 
         private static double numberArg(Term arg, String name) throws Exception {
@@ -142,5 +162,15 @@ public class sp_local extends embedded.mas.bridges.jacamo.defaultEmbeddedInterna
                 this.targetZned = targetZned;
             }
 
+        }
+
+        private static class ReferenceFrame {
+            final LocalPose pose;
+            final double yaw;
+
+            ReferenceFrame(LocalPose pose, double yaw) {
+                this.pose = pose;
+                this.yaw = yaw;
+            }
         }
 }

@@ -11,10 +11,14 @@
         actuationName: MAV_CMD_COMPONENT_ARM_DISARM
       - actionName: takeoff
         actuationName: MAV_CMD_NAV_TAKEOFF
+      - actionName: takeoff_cmd
+        actuationName: MAV_CMD_NAV_TAKEOFF
       - actionName: set_mode
         actuationName: MAV_CMD_DO_SET_MODE
       - actionName: set_message_interval
         actuationName: MAV_CMD_SET_MESSAGE_INTERVAL
+      - actionName: request_data_stream
+        actuationName: REQUEST_DATA_STREAM
       - actionName: waypoint
         actuationName: MAV_CMD_NAV_WAYPOINT
       - actionName: reposition
@@ -26,6 +30,10 @@
       # New – local setpoint
       - actionName: sp_local
         actuationName: SET_POSITION_TARGET_LOCAL_NED
+      - actionName: setpoint_local
+        actuationName: SETPOINT_LOCAL
+      - actionName: reset_setpoint_local_reference
+        actuationName: RESET_SETPOINT_LOCAL_REFERENCE
       # New – attitude target
       - actionName: attitude_target
         actuationName: SET_ATTITUDE_TARGET
@@ -44,3 +52,5 @@
         actuationName: PARAM_SET
       - actionName: param_request_read
         actuationName: PARAM_REQUEST_READ
+      - actionName: camera_capture
+        actuationName: MAV_CMD_IMAGE_START_CAPTURE

@@ -1,0 +1,8 @@
+[sample_agent] Waiting for nav pose...
+[sample_agent] Demo: Offboard mode using high-level setpoint local with (Forward, Right, Up).
+[sample_agent] No fail event was generated for +!offboard_body_relative_position_stream[source(self)]
+[sample_agent] 
+intention 2: 
+    +!offboard_body_relative_position_stream[source(self)] <- ... !offboard_body_relative_position_stream / {Right=0, Forward=2, Up=0}
+
+[sample_agent] Found a goal for which there is no applicable plan: +!offboard_body_relative_position_stream[source(self)]

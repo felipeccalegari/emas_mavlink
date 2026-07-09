@@ -27,8 +27,8 @@
 /* End of Takeoff and RTL example for Ardupilot. */
 
 /* Start of GUIDED mode - low-level for Ardupilot. */
-
-/* gps_gap_ns(1000000000).
+/* 
+gps_gap_ns(1000000000).
 last_gps_ns(0).
 +globalpositionint(_,Lat,Lon,Alt,RelAlt,_,_,_,_)
   : not home_gps(_,_) & last_gps_ns(Last) & gps_gap_ns(Gap)
@@ -93,124 +93,214 @@ last_gps_ns(0).
     .print("Returning to launch..."). */
 /* End of GUIDED mode - low-level for Ardupilot */
 
-/* "High-level" body-relative position example for ArduPilot GUIDED mode. */
-/* !demo_offboard_body_relative_position.
+// Used nanoseconds to avoid perceptions spamming in the terminal and affect simulation behavior.
+/* hb_gap_ns(5000000000).
+lp_gap_ns(7000000000).
+att_gap_ns(7000000000).
+sys_gap_ns(3000000000).
+gps_gap_ns(7000000000).
 
-+!demo_offboard_body_relative_position
-  : not nav_pose_local(_,_,_,_) & not guided_pose_stream_requested
+last_hb_ns(0).
+last_lp_ns(0).
+last_att_ns(0).
+last_sys_ns(0).
+last_gps_ns(0).
+
+/* Mavlink HEARTBEAT perception example */
+/*
++heartbeat(A,B,C,D,E,F)
+  : last_hb_ns(Last) & hb_gap_ns(Gap)
   <-
-    +guided_pose_stream_requested;
-    .set_message_interval(30, 500000, 0, 0, 0, 0, 0); // ATTITUDE at 2 Hz
-    .set_message_interval(32, 500000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 2 Hz
-    .print("Waiting for local pose before GUIDED body-relative demo...");
-    .wait(500);
-    !demo_offboard_body_relative_position.
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_hb_ns(_);
+      +last_hb_ns(Now);
+      .print("1. Heartbeat: type=", A, ", autopilot=", B, ", base_mode=", C, ", custom_mode=", D,
+             ", system_status=", E, ", mavlink_version=", F)
+    }. */ 
+/* End of Mavlink HEARTBEAT perception example */
 
-+!demo_offboard_body_relative_position
-  : not nav_pose_local(_,_,_,_) & guided_pose_stream_requested
+/* High-level body-relative position example for ArduPilot GUIDED mode ending with LAND.
+   Local MAVLink form:
+     .setpoint_local(Forward, Right, Up)
+   lets the MAVLink bridge compute a fresh absolute LOCAL_NED target from its
+   cached LOCAL_POSITION_NED + ATTITUDE telemetry. It does not use global
+   position.
+*/
+/* !demo_guided_relative_cross_land.
+
++!demo_guided_relative_cross_land
   <-
-    .wait(500);
-    !demo_offboard_body_relative_position.
+    .nano_time(T1);
+    .print("Time1: ", T1);
+    .request_data_stream(6, 10, 1); // MAV_DATA_STREAM_POSITION
+    .set_message_interval(32, 100000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 10 Hz
+    .set_message_interval(30, 100000, 0, 0, 0, 0, 0); // ATTITUDE at 10 Hz
+    .print("Requested LOCAL_POSITION_NED and ATTITUDE streams.");
+    .wait(3000);
 
-+!demo_offboard_body_relative_position
-  : nav_pose_local(_,_,_,_)
-  <-
-    .print("Demo: GUIDED mode using high-level sp_local(Forward, Right, Up).");
+    .print("ArduPilot GUIDED - using body-offset setpoint_local(Forward, Right, Up).");
 
-    // ArduCopter GUIDED mode: custom-mode-enabled=1, mode=4 (GUIDED), unused=0
-    .set_mode(1, 4, 0);
+    .set_mode(1, 4, 0); // ArduCopter GUIDED: custom-mode-enabled=1, mode=4, unused=0
     .wait(1000);
 
     .arming(1);
     .wait(3000);
 
-    .takeoff(0, 0, 0, 0, 0, 0, 3.0);
-    .print("Taking off to 3m and waiting for altitude to stabilize...");
-    .wait(20000);
-
-    .sp_local(0.0, -3.0, 0.0); // move 3 m to the drone's current left
-    .wait(5000);
-    .sp_local(2.0, 0.0, 0.0); // then move 2 m forward from the drone's current heading
-    .wait(5000);
-    .sp_local(2.0, 2.0, 0.0); // forward-right
-    .wait(5000);
-    .sp_local(0.0, 3.0, 0.0); // move 3 m to the drone's current right
-    .wait(5000);
-    .sp_local(-2.0, 0.0, 0.0); // move 2 m backward from the drone's current heading
-    .wait(5000);
-    .rtl;
-    .wait(200);
-    .print("Returning to launch and finishing GUIDED body-relative demo."). */
-/* End of high-level body-relative position example for ArduPilot GUIDED mode. */
-
-/* High-level relative position example for ArduPilot GUIDED mode ending with LAND. */
-!demo_guided_relative_cross_land.
-
-+!demo_guided_relative_cross_land
-  : not nav_pose_local(_,_,_,_) & not guided_pose_stream_requested
-  <-
-    +guided_pose_stream_requested;
-    .set_message_interval(30, 500000, 0, 0, 0, 0, 0); // ATTITUDE at 2 Hz
-    .set_message_interval(32, 500000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 2 Hz
-    .print("Waiting for local pose before GUIDED relative LAND demo...");
-    .wait(500);
-    !demo_guided_relative_cross_land.
-
-+!demo_guided_relative_cross_land
-  : not nav_pose_local(_,_,_,_) & guided_pose_stream_requested
-  <-
-    .wait(500);
-    !demo_guided_relative_cross_land.
-
-+!demo_guided_relative_cross_land
-  : nav_pose_local(_,_,_,_)
-  <-
-    .print("Demo: take off 2m, move with high-level relative offsets, then land.");
-
-    .set_mode(1, 4, 0); // custom-mode-enabled=1, mode=4 (GUIDED), unused=0
-    .wait(1000);
-
-    .arming(1);
-    .wait(3000);
-
-    .takeoff(0, 0, 0, 0, 0, 0, 2.0);
+    .takeoff_cmd(0.0, 0.0, 0.0, 0.0, 2.0);
     .print("Taking off to 2m and waiting for altitude to stabilize...");
-    .wait(20000);
-
-    .reset_sp_local_reference;
-    .print("Locked sp_local reference yaw after takeoff.");
-    .wait(3000);
-
-    .print("Command: move 2m forward.");
-    .sp_local(2.0, 0.0, 0.0); // 2 m forward
-    .wait(10000);
-    .print("Command: move 2m backward to return.");
-    .sp_local(-2.0, 0.0, 0.0); // back 2 m
+    .reset_setpoint_local_reference;
+    .print("Locked setpoint_local reference yaw after takeoff.");
     .wait(10000);
 
-    .print("Command: move 2m right.");
-    .sp_local(0.0, 2.0, 0.0); // 2 m right
+    .print("Command: move 2 m forward.");
+    .setpoint_local(2.0, 0.0, 0.0);
     .wait(10000);
-    .print("Command: move 2m left to return.");
-    .sp_local(0.0, -2.0, 0.0); // back 2 m
-    .wait(10000);
-
-    .print("Command: move 2m left.");
-    .sp_local(0.0, -2.0, 0.0); // 2 m left
-    .wait(10000);
-    .print("Command: move 2m right to return.");
-    .sp_local(0.0, 2.0, 0.0); // back 2 m
+    .print("Command: move 2 m backward to return.");
+    .setpoint_local(-2.0, 0.0, 0.0);
     .wait(10000);
 
-    .print("Command: move 2m backward.");
-    .sp_local(-2.0, 0.0, 0.0); // 2 m backward
+    .print("Command: move 2 m right.");
+    .setpoint_local(0.0, 2.0, 0.0);
     .wait(10000);
-    .print("Command: move 2m forward to return.");
-    .sp_local(2.0, 0.0, 0.0); // back 2 m
+    .print("Command: move 2 m left to return.");
+    .setpoint_local(0.0, -2.0, 0.0);
     .wait(10000);
 
-    .print("Command: land now.");
-    .land(0, 0, 0, 0, 0, 0, 0.0);
+    .print("Command: move 2 m left.");
+    .setpoint_local(0.0, -2.0, 0.0);
+    .wait(10000);
+    .print("Command: move 2 m right to return.");
+    .setpoint_local(0.0, 2.0, 0.0);
+    .wait(10000);
+
+    .print("Command: move 2 m backward.");
+    .setpoint_local(-2.0, 0.0, 0.0);
+    .wait(10000);
+    .print("Command: move 2 m forward to return.");
+    .setpoint_local(2.0, 0.0, 0.0);
+    .wait(10000);
+
+    .set_mode(1, 9, 0); // ArduCopter LAND: custom-mode-enabled=1, mode=9, unused=0
     .wait(200);
-    .print("Landing and finishing GUIDED high-level LAND demo.").
+    .nano_time(T2);
+    .print("Time2: ", T2);
+    .print("Landing and finishing GUIDED and LAND demo."). */
 /* End of high-level relative position example for ArduPilot GUIDED mode ending with LAND. */
+
+/* LOCAL_POSITION_NED monitor: prints local position every 5 seconds. */
+lp_print_gap_ns(5000000000).
+last_lp_print_ns(0).
+
++localpositionned(_,X,Y,Zned,_,_,_)
+  : lp_print_gap_ns(Gap) & last_lp_print_ns(Last)
+  <-
+    .nano_time(Now);
+    if (Now - Last >= Gap) {
+      -last_lp_print_ns(_);
+      +last_lp_print_ns(Now);
+      Alt = -Zned;
+      .print("[LOCAL_POSITION_NED] x=", X, " y=", Y, " z_ned=", Zned, " alt=", Alt)
+    }.
+
+/* End of LOCAL_POSITION_NED monitor. */
+
+/* Beginning of camera examples for ArduPilot. */
+
+/* camera_capture_target_count(20).
+pending_camera_capture_iteration(0).
+pending_camera_capture_flight_iteration(0). */
+
+/* ArduPilot example 4: ACK-driven camera capture counter. */
+/* !demo_camera_capture.
+
++!demo_camera_capture <-
+    -pending_camera_capture_iteration(_);
+    +pending_camera_capture_iteration(1);
+    .print("Starting MAVLink ACK-driven camera capture demo with 20 iterations.");
+    .wait(3000);
+    .camera_capture(0, 0, 1, 1, 0, 0, 0).
+
++command_ack(2000, 0, Stamp, SysId, CompId)
+  : pending_camera_capture_iteration(Current) & camera_capture_target_count(Target)
+  <-
+    .print("Example 4 ACK accepted at stamp=", Stamp,
+           " from sys=", SysId, " comp=", CompId,
+           " for iteration ", Current, " of ", Target, ".");
+    -command_ack(2000, 0, Stamp, SysId, CompId);
+    if (Current < Target) {
+      Next = Current + 1;
+      -pending_camera_capture_iteration(_);
+      +pending_camera_capture_iteration(Next);
+      .camera_capture(0, 0, 1, Next, 0, 0, 0)
+    } else {
+      -pending_camera_capture_iteration(_);
+      +pending_camera_capture_iteration(0);
+      .print("Example 4 finished at stamp=", Stamp)
+    }.
+
++command_ack(2000, Result, Stamp, SysId, CompId)
+  : pending_camera_capture_iteration(Current) & Current > 0 & Result \== 0
+  <-
+    .print("Example 4 camera ACK not accepted: command=2000",
+           ", result=", Result,
+           ", stamp=", Stamp,
+           ", sys=", SysId,
+           ", comp=", CompId,
+           ", stopping at iteration ", Current, ".");
+    -pending_camera_capture_iteration(_);
+    +pending_camera_capture_iteration(0);
+    -command_ack(2000, Result, Stamp, SysId, CompId).
+ */
+/* ArduPilot example 5: GUIDED takeoff, 20 ACK-driven captures, then land. */
+/* !demo_camera_capture_flight.
+
++!demo_camera_capture_flight <-
+    .print("Starting MAVLink flight + ACK-driven camera capture demo.");
+    .set_mode(1, 4, 0); // ArduCopter GUIDED
+    .wait(1000);
+    .arming(1);
+    .wait(5000);
+    .takeoff(0, 0, 0, 0, 0, 0, 3.0);
+    .print("Takeoff command sent to 3m.");
+    .wait(12000);
+    -pending_camera_capture_flight_iteration(_);
+    +pending_camera_capture_flight_iteration(1);
+    .print("Beginning 20 ACK-driven captures.");
+    .camera_capture(0, 0, 1, 1, 0, 0, 0).
+
++command_ack(2000, 0, Stamp, SysId, CompId)
+  : pending_camera_capture_flight_iteration(Current) & camera_capture_target_count(Target)
+  <-
+    .print("Example 5 ACK accepted at stamp=", Stamp,
+           " from sys=", SysId, " comp=", CompId,
+           " for iteration ", Current, " of ", Target, ".");
+    -command_ack(2000, 0, Stamp, SysId, CompId);
+    if (Current < Target) {
+      Next = Current + 1;
+      -pending_camera_capture_flight_iteration(_);
+      +pending_camera_capture_flight_iteration(Next);
+      .camera_capture(0, 0, 1, Next, 0, 0, 0)
+    } else {
+      -pending_camera_capture_flight_iteration(_);
+      +pending_camera_capture_flight_iteration(0);
+      .print("Example 5 finished at stamp=", Stamp);
+      .wait(3000);
+      .land(0, 0, 0, 0, 0, 0, 0.0);
+      .print("Landing after capture sequence.")
+    }.
+
++command_ack(2000, Result, Stamp, SysId, CompId)
+  : pending_camera_capture_flight_iteration(Current) & Current > 0 & Result \== 0
+  <-
+    .print("Example 5 camera ACK not accepted: command=2000",
+           ", result=", Result,
+           ", stamp=", Stamp,
+           ", sys=", SysId,
+           ", comp=", CompId,
+           ", stopping at iteration ", Current, ".");
+    -pending_camera_capture_flight_iteration(_);
+    +pending_camera_capture_flight_iteration(0);
+    -command_ack(2000, Result, Stamp, SysId, CompId). */
+
+/* End of camera examples for ArduPilot. */

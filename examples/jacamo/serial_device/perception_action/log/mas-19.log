@@ -1,0 +1,29 @@
+[sample_agent] Demo: upload a short mission and start AUTO mission.
+[sample_agent] Attitude: roll=1038880, pitch=-0.0023339908, yaw=-0.00199238
+[sample_agent] [GPS] lat=473980199 lon=85462188 alt=485 relAlt=202
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=1044880, pitch=-0.009854809, yaw=-0.0027113275
+[sample_agent] [GPS] lat=473980198 lon=85462197 alt=753 relAlt=292
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=1051576, pitch=0.1799199, yaw=0.07833728
+[sample_agent] [GPS] lat=473979838 lon=85461713 alt=4437 relAlt=3976
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=1058180, pitch=0.015914483, yaw=0.006719982
+[sample_agent] [GPS] lat=473980227 lon=85462192 alt=4457 relAlt=3995
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=1064880, pitch=-6.859655E-4, yaw=-0.003248712
+[sample_agent] [GPS] lat=473980199 lon=85462183 alt=763 relAlt=302
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=1071680, pitch=-0.004496416, yaw=-0.0030856603
+[sample_agent] [GPS] lat=473980196 lon=85462182 alt=145 relAlt=-316
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] Attitude: roll=1078380, pitch=-0.003918523, yaw=-0.0035195532
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473980201 lon=85462184 alt=182 relAlt=-278
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] Attitude: roll=1085180, pitch=-0.0036566905, yaw=-0.002812136
+[sample_agent] [GPS] lat=473980196 lon=85462184 alt=135 relAlt=-325
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] Attitude: roll=1091880, pitch=-0.0033350834, yaw=-0.0031931873

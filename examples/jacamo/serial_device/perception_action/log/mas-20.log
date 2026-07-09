@@ -1,0 +1,21 @@
+[sample_agent] Demo: upload a short mission and start AUTO mission.
+[sample_agent] Attitude: roll=874276, pitch=-0.0030398504, yaw=-0.0017446362
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3
+[sample_agent] [GPS] lat=473980203 lon=85462187 alt=358 relAlt=113
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=880380, pitch=-0.0066992124, yaw=-0.007462281
+[sample_agent] [GPS] lat=473980198 lon=85462192 alt=1324 relAlt=1040
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=886980, pitch=0.1877669, yaw=0.021990463
+[sample_agent] [GPS] lat=473979969 lon=85461688 alt=4305 relAlt=4021
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=67371008, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=893880, pitch=0.011792371, yaw=0.023053259
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] [GPS] lat=473980219 lon=85462224 alt=4281 relAlt=3998
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=900476, pitch=0.0010684404, yaw=-0.0051279324
+[sample_agent] [GPS] lat=473980200 lon=85462184 alt=360 relAlt=76
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=157, custom_mode=84148224, system_status=MAV_STATE_ACTIVE, mavlink_version=3
+[sample_agent] Attitude: roll=907080, pitch=-0.0040535727, yaw=-0.0027963421
+[sample_agent] [GPS] lat=473980200 lon=85462183 alt=686 relAlt=403
+[sample_agent] 1. Heartbeat: type=MAV_TYPE_QUADROTOR, autopilot=MAV_AUTOPILOT_PX4, base_mode=29, custom_mode=50593792, system_status=MAV_STATE_STANDBY, mavlink_version=3

@@ -1,0 +1,13 @@
+[ardupilot] Requested LOCAL_POSITION_NED stream; waiting for localpositionned telemetry...
+[ardupilot] ArduPilot GUIDED - using body-offset setpoint_local(Forward, Right, Up).
+[ardupilot] Taking off to 2m and waiting for altitude to stabilize...
+[ardupilot] Locked setpoint_local reference yaw after takeoff.
+[ardupilot] Command: move 2 m forward.
+[ardupilot] Command: move 2 m backward to return.
+[ardupilot] Command: move 2 m right.
+[ardupilot] Command: move 2 m left to return.
+[ardupilot] Command: move 2 m left.
+[ardupilot] Command: move 2 m right to return.
+[ardupilot] Command: move 2 m backward.
+[ardupilot] Command: move 2 m forward to return.
+[ardupilot] Landing and finishing GUIDED high-level LAND demo.
