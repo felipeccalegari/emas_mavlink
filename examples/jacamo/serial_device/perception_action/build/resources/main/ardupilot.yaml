@@ -19,6 +19,8 @@
         actuationName: MAV_CMD_SET_MESSAGE_INTERVAL
       - actionName: request_data_stream
         actuationName: REQUEST_DATA_STREAM
+      - actionName: set_stream_rate
+        actuationName: REQUEST_DATA_STREAM
       - actionName: waypoint
         actuationName: MAV_CMD_NAV_WAYPOINT
       - actionName: reposition

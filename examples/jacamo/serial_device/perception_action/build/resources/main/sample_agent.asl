@@ -139,7 +139,7 @@ PNorm is normalized to [0.0, 1.0] so it matches MAVROS-style threshold checks mo
 PRaw is the MAVLink battery_remaining field in [0,100].
 VoltageV/CurrentA are -1 when PX4 does not provide them.
 */
-battery_low_threshold_raw(70).
+/* battery_low_threshold_raw(70).
 battery_print_gap_ns(2000000000).
 last_battery_print_ns(0).
 
@@ -153,7 +153,7 @@ last_battery_print_ns(0).
       -last_battery_print_ns(_);
       +last_battery_print_ns(Now);
       .print("[battery] Battery getting low: raw=", PRaw, "% voltage=", VoltageV, "V current=", CurrentA, "A")
-    }.
+    }. */
 /* End of Mavlink battery perception example */
 
 /* Mavlink SYS_STATUS perception example. */
@@ -192,7 +192,7 @@ last_battery_print_ns(0).
 Starts at 1 and only sends the next increment after PX4 confirms
 the last published value through PARAM_VALUE.
 */
-/* !demo_param_counter.
+!demo_param_counter.
 
 +!demo_param_counter <-
     -expected_param_value(_);
@@ -218,11 +218,11 @@ the last published value through PARAM_VALUE.
         .print("MAVLink parameter counter finished at value ", Value, ".");
         -expected_param_value(_)
       }
-    }. */
+    }.
 /* End of MAVLink parameter counter. */
 
 /* "High-level" Offboard example for PX4. */
-!demo_offboard_body_relative_position.
+/* !demo_offboard_body_relative_position.
 +!demo_offboard_body_relative_position
   : not nav_pose_local(_,_,_,_)
   <-
@@ -281,7 +281,7 @@ the last published value through PARAM_VALUE.
 +!offboard_body_relative_position_stream
   : not offboard_body_relative_stream_enabled
   <-
-    true.
+    true. */
 /* End of Offboard "High-level" position example for PX4. */
 
 /*Beginning of Camera example - PX4 */

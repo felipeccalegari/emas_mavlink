@@ -127,31 +127,25 @@ last_gps_ns(0).
    cached LOCAL_POSITION_NED + ATTITUDE telemetry. It does not use global
    position.
 */
-/* !demo_guided_relative_cross_land.
+!demo_guided_relative_cross_land.
 
 +!demo_guided_relative_cross_land
   <-
     .nano_time(T1);
     .print("Time1: ", T1);
-    .request_data_stream(6, 10, 1); // MAV_DATA_STREAM_POSITION
-    .set_message_interval(32, 100000, 0, 0, 0, 0, 0); // LOCAL_POSITION_NED at 10 Hz
-    .set_message_interval(30, 100000, 0, 0, 0, 0, 0); // ATTITUDE at 10 Hz
-    .print("Requested LOCAL_POSITION_NED and ATTITUDE streams.");
-    .wait(3000);
-
-    .print("ArduPilot GUIDED - using body-offset setpoint_local(Forward, Right, Up).");
-
+    .print("ArduPilot GUIDED - using local setpoint_local(Forward, Right, Up) with heading hold.");
+    .set_stream_rate(6, 5, true);
+    .print("Requested MAVLink STREAM_POSITION at 5 Hz.");
+    .wait(2000);
     .set_mode(1, 4, 0); // ArduCopter GUIDED: custom-mode-enabled=1, mode=4, unused=0
     .wait(1000);
-
-    .arming(1);
+    .arming(true);
     .wait(3000);
-
     .takeoff_cmd(0.0, 0.0, 0.0, 0.0, 2.0);
-    .print("Taking off to 2m and waiting for altitude to stabilize...");
+    .print("Takeoff command sent to 2.0 m.");
     .reset_setpoint_local_reference;
     .print("Locked setpoint_local reference yaw after takeoff.");
-    .wait(10000);
+    .wait(15000);
 
     .print("Command: move 2 m forward.");
     .setpoint_local(2.0, 0.0, 0.0);
@@ -185,11 +179,11 @@ last_gps_ns(0).
     .wait(200);
     .nano_time(T2);
     .print("Time2: ", T2);
-    .print("Landing and finishing GUIDED and LAND demo."). */
+    .print("LAND mode requested to finish GUIDED demo.").
 /* End of high-level relative position example for ArduPilot GUIDED mode ending with LAND. */
 
-/* LOCAL_POSITION_NED monitor: prints local position every 5 seconds. */
-lp_print_gap_ns(5000000000).
+/* LOCAL_POSITION_NED monitor: prints local position every 3 seconds. */
+lp_print_gap_ns(3000000000).
 last_lp_print_ns(0).
 
 +localpositionned(_,X,Y,Zned,_,_,_)

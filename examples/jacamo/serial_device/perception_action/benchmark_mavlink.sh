@@ -159,7 +159,7 @@ if [[ -n "$PID_JAS" ]]; then
 fi
 
 # -------------------------------------------------
-# Run benchmark for 80 seconds
+# Run benchmark for 30 seconds
 # -------------------------------------------------
 sleep 30
 
