@@ -1,6 +1,6 @@
 /* Reposition example*/
 
-/* !reposition.
+!reposition.
 
 +!reposition <-
     -awaiting_z(_);
@@ -31,7 +31,7 @@
             .land(0, 0, 0, 0, 47.3979710, 8.5461637, 0.0);
         };
     };
-    -step_transitioning(_). */
+    -step_transitioning(_).
 /* End of Reposition example */
 
 /* Takeoff and land example.*/
@@ -76,8 +76,8 @@
 /* End of Reposition and Land example */
 
 /* Mission mode and mission start example. */
-/* 
-!demo_mission.
+
+/* !demo_mission.
 +!demo_mission <-
     .print("Demo: upload a short mission and start AUTO mission.");
     .mission_clear;
@@ -192,7 +192,7 @@ last_battery_print_ns(0).
 Starts at 1 and only sends the next increment after PX4 confirms
 the last published value through PARAM_VALUE.
 */
-!demo_param_counter.
+/* !demo_param_counter.
 
 +!demo_param_counter <-
     -expected_param_value(_);
@@ -218,7 +218,7 @@ the last published value through PARAM_VALUE.
         .print("MAVLink parameter counter finished at value ", Value, ".");
         -expected_param_value(_)
       }
-    }.
+    }. */
 /* End of MAVLink parameter counter. */
 
 /* "High-level" Offboard example for PX4. */

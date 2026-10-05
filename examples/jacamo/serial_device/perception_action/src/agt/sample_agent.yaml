@@ -1,6 +1,6 @@
 --- # Devices
 - device_id: arduino1
-  className: embedded.mas.bridges.jacamo.JSONWatcherDevice
+  className: embedded.mas.bridges.mavlink.MavlinkJSONWatcherDevice
   microcontroller: 
       id: arduino1
       className: Mavlink4EmbeddedMas

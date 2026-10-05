@@ -5,10 +5,16 @@
 package embedded.mas.bridges.jacamo;
 import embedded.mas.bridges.javard.MicrocontrollerMonitor;
 
+import java.io.ByteArrayInputStream;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 
 import embedded.mas.exception.PerceivingException;
 import jason.asSemantics.Unifier;
@@ -17,39 +23,34 @@ import jason.asSyntax.Literal;
 
 public class JSONWatcherDevice extends SerialDevice implements IDevice {
 	
-	// Keep only the latest value for each belief functor so multiple MAVLink perceptions can coexist.
-	private final Map<String, Literal> latestBeliefs = Collections.synchronizedMap(new LinkedHashMap<String, Literal>());
+	List<Collection<Literal>> listOfBeliefs = Collections.synchronizedList(new ArrayList<Collection<Literal>>());
 	
 	public JSONWatcherDevice(Atom id, IPhysicalInterface microcontroller) {
+		this(id, microcontroller, true);
+	}
+
+	/** Lets specialised watchers supply their own monitor without starting two serial readers. */
+	protected JSONWatcherDevice(Atom id, IPhysicalInterface microcontroller, boolean startMonitor) {
 		super(id, microcontroller);	
-		// Changed to use the new direct-update constructor instead of sharing a belief list.
-		MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(this, this.getMicrocontroller());
-		microcontrollerMonitor.start();
+		if (startMonitor) {
+			MicrocontrollerMonitor microcontrollerMonitor = new MicrocontrollerMonitor(listOfBeliefs,this.getMicrocontroller());
+			microcontrollerMonitor.start();
+		}
 	}
 	
 	@Override
 	public Collection<Literal> getPercepts() throws PerceivingException{
-		// Return the latest belief of each type, then clear the snapshot for the next cycle.
-		synchronized (latestBeliefs) {
-			Collection<Literal> percepts = new java.util.ArrayList<Literal>(latestBeliefs.values());
-			latestBeliefs.clear();
-			return percepts;
-		}
-	}
-
-	// New helper used by MicrocontrollerMonitor to publish the newest parsed beliefs directly.
-	public void updateLatestBeliefs(Collection<Literal> percepts) {
-		if (percepts == null || percepts.isEmpty()) {
-			return;
-		}
-		synchronized (latestBeliefs) {
-			for (Literal percept : percepts) {
-				if (percept != null) {
-					latestBeliefs.put(percept.getFunctor(), percept);
-				}
+		
+		Collection<Literal> percepts = new ArrayList<Literal>();
+		
+		if(listOfBeliefs.size()>0) {
+			 percepts = listOfBeliefs.get(listOfBeliefs.size()-1);
+			synchronized (listOfBeliefs) {
+				listOfBeliefs.clear();
 			}
 		}
-		notifyPerceptAvailable();
+		try {Thread.sleep((long)(Math.random() * 1000)); } catch (InterruptedException e) { } //espera um tempo aleatório antes de continuar
+	return percepts;
 	}
 
 	@Override

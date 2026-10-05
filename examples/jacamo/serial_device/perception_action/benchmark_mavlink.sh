@@ -161,7 +161,7 @@ fi
 # -------------------------------------------------
 # Run benchmark for 30 seconds
 # -------------------------------------------------
-sleep 30
+sleep 120
 
 echo "$(date)"
 echo "Benchmark finished."
