@@ -122,7 +122,7 @@ else
         command -v setsid >/dev/null || { echo 'setsid is required to launch JaCaMo.' >&2; exit 1; }
         rm -f .stop___MAS || exit 1
         # Output remains in the terminal, as in the original benchmark.
-        setsid ./gradlew --no-daemon -q --console=plain run &
+        setsid ./gradlew --offline --no-daemon -q --console=plain run &
         APP_PID=$!
         echo "Starting JaCaMo..."
         for ((attempt=0; attempt<120; attempt++)); do
